@@ -1030,7 +1030,7 @@ static bool recreateWindow(int w, int h, int bpp, bool fullscreen, int displayIn
 	if(fullscreen)
 	{
 		//in full-screen mode always use desktop resolution
-		mainWindow = SDL_CreateWindow(NAME.c_str(), SDL_WINDOWPOS_UNDEFINED_DISPLAY(displayIndex),SDL_WINDOWPOS_UNDEFINED_DISPLAY(displayIndex), 0, 0, SDL_WINDOW_FULLSCREEN_DESKTOP);
+		mainWindow = SDL_CreateWindow(NAME.c_str(), SDL_WINDOWPOS_UNDEFINED_DISPLAY(displayIndex),SDL_WINDOWPOS_UNDEFINED_DISPLAY(displayIndex), w, h, SDL_WINDOW_FULLSCREEN);
 		SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "linear");
 	}
 	else
@@ -1056,9 +1056,9 @@ static bool recreateWindow(int w, int h, int bpp, bool fullscreen, int displayIn
 	SDL_GetRendererInfo(mainRenderer,&info);
 	logGlobal->infoStream() << "Created renderer " << info.name;
 
-	SDL_RenderSetLogicalSize(mainRenderer, w, h);
+	//SDL_RenderSetLogicalSize(mainRenderer, w, h);
 
-	SDL_RenderSetViewport(mainRenderer, nullptr);
+	//SDL_RenderSetViewport(mainRenderer, nullptr);
 
 
 
