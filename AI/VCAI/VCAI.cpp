@@ -1196,7 +1196,7 @@ bool VCAI::tryBuildStructure(const CGTownInstance * t, BuildingID building, unsi
 		{
 			if(!containsSavedRes(b->resources))
 			{
-				logAi->debug("Player %d will build %s in town of %s at %s", playerID, b->Name(), t->name, t->pos());
+				logAi->info("Player %d will build %s in town of %s at %s", playerID, b->Name(), t->name, t->pos());
 				cb->buildBuilding(t, buildID);
 				return true;
 			}
@@ -1346,6 +1346,8 @@ bool VCAI::tryBuildNextStructure(const CGTownInstance * t, std::vector<BuildingI
 //Set of buildings for different goals. Does not include any prerequisites.
 static const BuildingID essential[] = {BuildingID::TAVERN, BuildingID::TOWN_HALL};
 static const BuildingID goldSource[] = {BuildingID::TOWN_HALL, BuildingID::CITY_HALL, BuildingID::CAPITOL};
+static const BuildingID cityhallRequirements[] = { BuildingID::MARKETPLACE, BuildingID::BLACKSMITH, BuildingID::MAGES_GUILD_1 };
+static const BuildingID capitolRequirements[] = { BuildingID::FORT, BuildingID::CITADEL, BuildingID::CASTLE };
 static const BuildingID unitsSource[] = { BuildingID::DWELL_LVL_1, BuildingID::DWELL_LVL_2, BuildingID::DWELL_LVL_3,
 	BuildingID::DWELL_LVL_4, BuildingID::DWELL_LVL_5, BuildingID::DWELL_LVL_6, BuildingID::DWELL_LVL_7};
 static const BuildingID unitsUpgrade[] = { BuildingID::DWELL_LVL_1_UP, BuildingID::DWELL_LVL_2_UP, BuildingID::DWELL_LVL_3_UP,
@@ -1372,9 +1374,23 @@ void VCAI::buildStructure(const CGTownInstance * t)
 		return;
 
 	//we're running out of gold - try to build something gold-producing. Multiplier can be tweaked, 6 is minimum due to buildings costs
-	if (currentRes[Res::GOLD] < townIncome * 6)
+	if (/*currentRes[Res::GOLD] < townIncome * 6*/ 1)
 		if (tryBuildNextStructure(t, std::vector<BuildingID>(goldSource, goldSource + ARRAY_COUNT(goldSource))))
 			return;
+
+
+	if (t->builtBuildings.find(BuildingID::CAPITOL) == t->builtBuildings.end())
+	{
+		if (t->builtBuildings.find(BuildingID::TOWN_HALL) != t->builtBuildings.end())
+			if (tryBuildAnyStructure(t, std::vector<BuildingID>(cityhallRequirements, cityhallRequirements + ARRAY_COUNT(cityhallRequirements))))
+				return;
+
+		if (t->builtBuildings.find(BuildingID::CITY_HALL) != t->builtBuildings.end())
+			if (tryBuildNextStructure(t, std::vector<BuildingID>(capitolRequirements, capitolRequirements + ARRAY_COUNT(capitolRequirements))))
+				return;
+
+		return;
+	}
 
 	if (cb->getDate(Date::DAY_OF_WEEK) > 6)// last 2 days of week - try to focus on growth
 	{
@@ -2264,7 +2280,7 @@ void VCAI::endTurn()
 	{
 		logAi->error("Not having turn at the end of turn???");
 	}
-	logAi->debugStream() << "Resources at the end of turn: " << cb->getResourceAmount();
+	logAi->infoStream() << "Resources at the end of turn: " << cb->getResourceAmount();
 
 	do
 	{
@@ -2748,7 +2764,7 @@ void VCAI::checkHeroArmy (HeroPtr h)
 
 void VCAI::recruitHero(const CGTownInstance * t, bool throwing)
 {
-	logAi->debugStream() << boost::format("Trying to recruit a hero in %s at %s") % t->name % t->visitablePos();
+	logAi->infoStream() << boost::format("Trying to recruit a hero in %s at %s") % t->name % t->visitablePos();
 
 	auto heroes = cb->getAvailableHeroes(t);
 	if(heroes.size())
@@ -2851,7 +2867,9 @@ void VCAI::validateObject(ObjectIdRef obj)
 TResources VCAI::freeResources() const
 {
 	TResources myRes = cb->getResourceAmount();
-	myRes[Res::GOLD] -= GOLD_RESERVE;
+	auto iterator = cb->getTownsInfo();
+	if (std::none_of(iterator.begin(), iterator.end(), [](const CGTownInstance * x) -> bool { return x->builtBuildings.find(BuildingID::CAPITOL) != x->builtBuildings.end(); }))
+		myRes[Res::GOLD] -= GOLD_RESERVE;
 	vstd::amax(myRes[Res::GOLD], 0);
 	return myRes;
 }

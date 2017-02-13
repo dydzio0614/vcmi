@@ -1010,8 +1010,10 @@ TGoalVec Conquer::getAllPossibleSubgoals()
 			}
 		}
 	}
-	if (!objs.empty() && ai->canRecruitAnyHero()) //probably no point to recruit hero if we see no objects to capture
-		ret.push_back (sptr(Goals::RecruitHero()));
+	if (!objs.empty()
+		&& std::any_of(objs.begin(), objs.end(), [](const CGObjectInstance * x) { return x->ID.num == Obj::TOWN || x->ID.num == Obj::HERO; })
+		&& ai->canRecruitAnyHero()) //probably no point to recruit hero if we see no objects to capture
+			ret.push_back (sptr(Goals::RecruitHero()));
 
 	if (ret.empty())
 		ret.push_back (sptr(Goals::Explore())); //we need to find an enemy
@@ -1125,7 +1127,7 @@ TGoalVec GatherArmy::getAllPossibleSubgoals()
 		{
 			for (auto h : cb->getAvailableHeroes(t)) //we assume that all towns have same set of heroes
 			{
-				if (h && h->getTotalStrength() > 500) //do not buy heroes with single creatures for GatherArmy
+				if (h && (h->getFaction() == t->town->faction->index) && h->getTotalStrength() > 500 && ai->freeResources()[Res::GOLD] > GameConstants::HERO_GOLD_COST) //do not buy heroes with single creatures for GatherArmy
 				{
 					ret.push_back(sptr(Goals::RecruitHero()));
 					break;
