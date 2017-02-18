@@ -1373,24 +1373,23 @@ void VCAI::buildStructure(const CGTownInstance * t)
 	if (tryBuildAnyStructure(t, std::vector<BuildingID>(essential, essential + ARRAY_COUNT(essential))))
 		return;
 
-	//we're running out of gold - try to build something gold-producing. Multiplier can be tweaked, 6 is minimum due to buildings costs
-	if (/*currentRes[Res::GOLD] < townIncome * 6*/ 1)
-		if (tryBuildNextStructure(t, std::vector<BuildingID>(goldSource, goldSource + ARRAY_COUNT(goldSource))))
+	//the more gold the better and less problems later
+	if (tryBuildNextStructure(t, std::vector<BuildingID>(goldSource, goldSource + ARRAY_COUNT(goldSource))))
+		return;
+
+	//buy prerequirements for next gold stage
+	if (vstd::contains(t->builtBuildings, BuildingID::TOWN_HALL))
+		if (tryBuildAnyStructure(t, std::vector<BuildingID>(cityhallRequirements, cityhallRequirements + ARRAY_COUNT(cityhallRequirements))))
 			return;
 
+	//if cannot build capitol, buying citadel and castle now may not be best idea
+	if (vstd::contains(t->builtBuildings, BuildingID::CITY_HALL) && cb->canBuildStructure(t, BuildingID::CAPITOL) != EBuildingState::HAVE_CAPITAL)
+		if (tryBuildNextStructure(t, std::vector<BuildingID>(capitolRequirements, capitolRequirements + ARRAY_COUNT(capitolRequirements))))
+			return;
 
-	if (t->builtBuildings.find(BuildingID::CAPITOL) == t->builtBuildings.end())
-	{
-		if (t->builtBuildings.find(BuildingID::TOWN_HALL) != t->builtBuildings.end())
-			if (tryBuildAnyStructure(t, std::vector<BuildingID>(cityhallRequirements, cityhallRequirements + ARRAY_COUNT(cityhallRequirements))))
-				return;
-
-		if (t->builtBuildings.find(BuildingID::CITY_HALL) != t->builtBuildings.end())
-			if (tryBuildNextStructure(t, std::vector<BuildingID>(capitolRequirements, capitolRequirements + ARRAY_COUNT(capitolRequirements))))
-				return;
-
-		return;
-	}
+	if( (!vstd::contains(t->builtBuildings, BuildingID::CAPITOL) && cb->canBuildStructure(t, BuildingID::CAPITOL) != EBuildingState::HAVE_CAPITAL)
+		|| (!vstd::contains(t->builtBuildings, BuildingID::CITY_HALL) && cb->canBuildStructure(t, BuildingID::CAPITOL) == EBuildingState::HAVE_CAPITAL) )
+		return; //save money for capitol or city hall if capitol unavailable, do not build other things
 
 	if (cb->getDate(Date::DAY_OF_WEEK) > 6)// last 2 days of week - try to focus on growth
 	{
@@ -1414,8 +1413,6 @@ void VCAI::buildStructure(const CGTownInstance * t)
 	}
 
 	//remaining tasks
-	if (tryBuildNextStructure(t, std::vector<BuildingID>(goldSource, goldSource + ARRAY_COUNT(goldSource))))
-		return;
 	if (tryBuildNextStructure(t, std::vector<BuildingID>(spells, spells + ARRAY_COUNT(spells))))
 		return;
 	if (tryBuildAnyStructure(t, std::vector<BuildingID>(extra, extra + ARRAY_COUNT(extra))))
@@ -2869,7 +2866,7 @@ TResources VCAI::freeResources() const
 	TResources myRes = cb->getResourceAmount();
 	auto iterator = cb->getTownsInfo();
 	if (std::none_of(iterator.begin(), iterator.end(), [](const CGTownInstance * x) -> bool { return x->builtBuildings.find(BuildingID::CAPITOL) != x->builtBuildings.end(); }))
-		myRes[Res::GOLD] -= GOLD_RESERVE;
+		myRes[Res::GOLD] -= GOLD_RESERVE; //what if capitol is blocked from building in all possessed towns (set in map editor)?
 	vstd::amax(myRes[Res::GOLD], 0);
 	return myRes;
 }
