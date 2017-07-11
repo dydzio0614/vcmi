@@ -1366,7 +1366,6 @@ void VCAI::buildStructure(const CGTownInstance * t)
 	//Possible - allow "locking" on specific building (build prerequisites and then building itself)
 
 	//below algorithm focuses on economy growth at start of the game.
-
 	TResources currentRes = cb->getResourceAmount();
 	TResources currentIncome = t->dailyIncome();
 	int townIncome = currentIncome[Res::GOLD];
