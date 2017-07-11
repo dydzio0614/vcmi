@@ -92,7 +92,7 @@ private:
 	void putPixelAt(SDL_Surface * dest, int X, int Y, size_t index, const std::array<SDL_Color, 8> & special) const;
 
 	template<int bpp>
-	void putPixel( ui8 * dest, const SDL_Color & color, size_t index, const std::array<SDL_Color, 8> & special) const;
+	void putPixel(ui8 * dest, const SDL_Color & color, size_t index, const std::array<SDL_Color, 8> & special) const;
 
 	template<int bpp>
 	void nextFrameT(SDL_Surface * dest, bool rotate);

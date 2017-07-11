@@ -44,6 +44,7 @@ public:
 	CCursorHandler * curh;
 	IMainVideoPlayer * videoh;
 };
+
 extern CClientState * CCS;
 
 /// CGameInfo class
@@ -68,4 +69,5 @@ public:
 
 	CGameInfo();
 };
-extern const CGameInfo* CGI;
+
+extern const CGameInfo * CGI;

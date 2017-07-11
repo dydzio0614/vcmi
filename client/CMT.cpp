@@ -76,7 +76,7 @@ namespace bfs = boost::filesystem;
 std::string NAME_AFFIX = "client";
 std::string NAME = GameConstants::VCMI_VERSION + std::string(" (") + NAME_AFFIX + ')'; //application name
 CGuiHandler GH;
-static CClient *client = nullptr;
+static CClient * client = nullptr;
 
 int preferredDriverIndex = -1;
 SDL_Window * mainWindow = nullptr;
@@ -98,13 +98,13 @@ static po::variables_map vm;
 //static bool setResolution = false; //set by event handling thread after resolution is adjusted
 
 static bool ermInteractiveMode = false; //structurize when time is right
-void processCommand(const std::string &message);
-static void setScreenRes(int w, int h, int bpp, bool fullscreen, int displayIndex, bool resetVideo=true);
+void processCommand(const std::string & message);
+static void setScreenRes(int w, int h, int bpp, bool fullscreen, int displayIndex, bool resetVideo = true);
 void dispose();
 void playIntro();
 static void mainLoop();
 //void requestChangingResolution();
-void startGame(StartInfo * options, CConnection *serv = nullptr);
+void startGame(StartInfo * options, CConnection * serv = nullptr);
 void endGame();
 
 #ifndef VCMI_WINDOWS
@@ -114,14 +114,14 @@ void endGame();
 #include <getopt.h>
 #endif
 
-void startTestMap(const std::string &mapname)
+void startTestMap(const std::string & mapname)
 {
 	StartInfo si;
 	si.mapname = mapname;
 	si.mode = StartInfo::NEW_GAME;
-	for (int i = 0; i < 8; i++)
+	for(int i = 0; i < 8; i++)
 	{
-		PlayerSettings &pset = si.playerInfos[PlayerColor(i)];
+		PlayerSettings & pset = si.playerInfos[PlayerColor(i)];
 		pset.color = PlayerColor(i);
 		pset.name = CGI->generaltexth->allTexts[468];//Computer
 		pset.playerID = PlayerSettings::PLAYER_AI;
@@ -137,20 +137,20 @@ void startTestMap(const std::string &mapname)
 	startGame(&si);
 }
 
-void startGameFromFile(const bfs::path &fname)
+void startGameFromFile(const bfs::path & fname)
 {
 	StartInfo si;
 	try //attempt retrieving start info from given file
 	{
-		if(fname.empty() || !bfs::exists(fname))
+		if(fname.empty() || !exists(fname))
 			throw std::runtime_error("Startfile \"" + fname.string() + "\" does not exist!");
 
 		CLoadFile out(fname);
-		if (!out.sfile || !*out.sfile)
-			throw std::runtime_error("Cannot read from startfile \"" + fname.string() +"\"!");
+		if(!out.sfile || !*out.sfile)
+			throw std::runtime_error("Cannot read from startfile \"" + fname.string() + "\"!");
 		out >> si;
 	}
-	catch(std::exception &e)
+	catch(std::exception & e)
 	{
 		logGlobal->errorStream() << "Failed to start from the file: " << fname << ". Error: " << e.what()
 			<< " Falling back to main menu.";
@@ -170,7 +170,7 @@ void init()
 	loadDLLClasses();
 	const_cast<CGameInfo*>(CGI)->setFromLib();
 
-	logGlobal->infoStream()<<"Initializing VCMI_Lib: "<<tmh.getDiff();
+	logGlobal->infoStream() << "Initializing VCMI_Lib: " << tmh.getDiff();
 
 
 	if(!settings["session"]["headless"].Bool())
@@ -181,15 +181,15 @@ void init()
 
 		CCS->curh->initCursor();
 		CCS->curh->show();
-		logGlobal->infoStream()<<"Screen handler: "<<pomtime.getDiff();
+		logGlobal->infoStream() << "Screen handler: " << pomtime.getDiff();
 		pomtime.getDiff();
 
 		graphics->load();
-		logGlobal->infoStream()<<"\tMain graphics: "<<pomtime.getDiff();
-		logGlobal->infoStream()<<"Initializing game graphics: "<<tmh.getDiff();
+		logGlobal->infoStream() << "\tMain graphics: " << pomtime.getDiff();
+		logGlobal->infoStream() << "Initializing game graphics: " << tmh.getDiff();
 
 		CMessage::init();
-		logGlobal->infoStream()<<"Message handler: "<<tmh.getDiff();
+		logGlobal->infoStream() << "Message handler: " << tmh.getDiff();
 	}
 }
 
@@ -199,26 +199,26 @@ static void prog_version(void)
 	std::cout << VCMIDirs::get().genHelpString();
 }
 
-static void prog_help(const po::options_description &opts)
+static void prog_help(const po::options_description & opts)
 {
-	auto time = std::time(0);
+	auto time = std::time(nullptr);
 	printf("%s - A Heroes of Might and Magic 3 clone\n", GameConstants::VCMI_VERSION.c_str());
-	printf("Copyright (C) 2007-%d VCMI dev team - see AUTHORS file\n", std::localtime(&time)->tm_year + 1900);
+	printf("Copyright (C) 2007-%d VCMI dev team - see AUTHORS file\n", localtime(&time)->tm_year + 1900);
 	printf("This is free software; see the source for copying conditions. There is NO\n");
 	printf("warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n");
 	printf("\n");
 	std::cout << opts;
 }
 
-static void SDLLogCallback(void*           userdata,
-                           int             category,
+static void SDLLogCallback(void * userdata,
+                           int category,
                            SDL_LogPriority priority,
-                           const char*     message)
+                           const char * message)
 {
 	//todo: convert SDL log priority to vcmi log priority
 	//todo: make separate log domain for SDL
 
-	logGlobal->debugStream() << "SDL(category " << category << "; priority " <<priority <<") "<<message;
+	logGlobal->debugStream() << "SDL(category " << category << "; priority " << priority << ") " << message;
 }
 
 #ifdef VCMI_APPLE
@@ -226,7 +226,7 @@ void OSX_checkForUpdates();
 #endif
 
 #if defined(VCMI_WINDOWS) && !defined (__GNUC__)
-int wmain(int argc, wchar_t* argv[])
+int wmain(int argc, wchar_t * argv[])
 #elif defined(VCMI_APPLE) || defined(VCMI_ANDROID)
 int SDL_main(int argc, char *argv[])
 #else
@@ -243,10 +243,10 @@ int main(int argc, char** argv)
     std::string workDir = executablePath.substr(0, executablePath.rfind('/'));
     chdir(workDir.c_str());
 
-    // Check for updates
+	// Check for updates
     OSX_checkForUpdates();
 
-    // Check that game data is prepared. Otherwise run vcmibuilder helper application
+	// Check that game data is prepared. Otherwise run vcmibuilder helper application
     FILE* check = fopen((VCMIDirs::get().userDataPath() / "game_data_prepared").string().c_str(), "r");
     if (check == nullptr) {
         system("open ./vcmibuilder.app");
@@ -254,7 +254,7 @@ int main(int argc, char** argv)
     }
     fclose(check);
 #endif
-    std::cout << "Starting... " << std::endl;
+	std::cout << "Starting... " << std::endl;
 	po::options_description opts("Allowed options");
 	opts.add_options()
 		("help,h", "display help and exit")
@@ -276,13 +276,13 @@ int main(int argc, char** argv)
 		("autoSkip", "automatically skip turns in GUI")
 		("disable-video", "disable video player")
 		("nointro,i", "skips intro movies")
-		("donotstartserver,d","do not attempt to start server and just connect to it instead server")
-        ("loadserver","specifies we are the multiplayer server for loaded games")
-        ("loadnumplayers",po::value<int>(),"specifies the number of players connecting to a multiplayer game")
-        ("loadhumanplayerindices",po::value<std::vector<int>>(),"Indexes of human players (0=Red, etc.)")
-        ("loadplayer", po::value<int>(),"specifies which player we are in multiplayer loaded games (0=Red, etc.)")
-        ("loadserverip",po::value<std::string>(),"IP for loaded game server")
-		("loadserverport",po::value<std::string>(),"port for loaded game server")
+		("donotstartserver,d", "do not attempt to start server and just connect to it instead server")
+		("loadserver", "specifies we are the multiplayer server for loaded games")
+		("loadnumplayers", po::value<int>(), "specifies the number of players connecting to a multiplayer game")
+		("loadhumanplayerindices", po::value<std::vector<int>>(), "Indexes of human players (0=Red, etc.)")
+		("loadplayer", po::value<int>(), "specifies which player we are in multiplayer loaded games (0=Red, etc.)")
+		("loadserverip", po::value<std::string>(), "IP for loaded game server")
+		("loadserverport", po::value<std::string>(), "port for loaded game server")
 		("serverport", po::value<si64>(), "override port specified in config file")
 		("saveprefix", po::value<std::string>(), "prefix for auto save files")
 		("savefrequency", po::value<si64>(), "limit auto save creation to each N days");
@@ -291,15 +291,15 @@ int main(int argc, char** argv)
 	{
 		try
 		{
-			po::store(po::parse_command_line(argc, argv, opts, po_style::unix_style|po_style::case_insensitive), vm);
+			store(parse_command_line(argc, argv, opts, po_style::unix_style | po_style::case_insensitive), vm);
 		}
-		catch(std::exception &e)
+		catch(std::exception & e)
 		{
-            std::cerr << "Failure during parsing command-line options:\n" << e.what() << std::endl;
+			std::cerr << "Failure during parsing command-line options:\n" << e.what() << std::endl;
 		}
 	}
 
-	po::notify(vm);
+	notify(vm);
 	if(vm.count("help"))
 	{
 		prog_help(opts);
@@ -326,7 +326,7 @@ int main(int argc, char** argv)
 	logGlobal->infoStream() << "The log file will be saved to " << logPath;
 
 	// Init filesystem and settings
-	preinitDLL(::console);
+	preinitDLL(console);
 	settings.init();
 	Settings session = settings.write["session"];
 	session["onlyai"].Bool() = vm.count("onlyAI");
@@ -351,16 +351,16 @@ int main(int argc, char** argv)
 	logConfig.configure();
 
 	// Some basic data validation to produce better error messages in cases of incorrect install
-	auto testFile = [](std::string filename, std::string message) -> bool
+	auto testFile = [](std::string filename, std::string message) ->bool
 	{
-		if (CResourceHandler::get()->existsResource(ResourceID(filename)))
+		if(CResourceHandler::get()->existsResource(ResourceID(filename)))
 			return true;
 
 		logGlobal->errorStream() << "Error: " << message << " was not found!";
 		return false;
 	};
 
-	if (!testFile("DATA/HELP.TXT", "Heroes III data") ||
+	if(!testFile("DATA/HELP.TXT", "Heroes III data") ||
 		!testFile("MODS/VCMI/MOD.JSON", "VCMI data"))
 	{
 		exit(1); // These are unrecoverable errors
@@ -373,14 +373,14 @@ int main(int argc, char** argv)
 	conf.init();
 	logGlobal->infoStream() << "Loading settings: " << pomtime.getDiff();
 
-	srand ( time(nullptr) );
+	srand(time(nullptr));
 
 
-	const JsonNode& video = settings["video"];
-	const JsonNode& res = video["screenRes"];
+	const JsonNode & video = settings["video"];
+	const JsonNode & res = video["screenRes"];
 
 	//something is really wrong...
-	if (res["width"].Float() < 100 || res["height"].Float() < 100)
+	if(res["width"].Float() < 100 || res["height"].Float() < 100)
 	{
 		logGlobal->errorStream() << "Fatal error: failed to load settings!";
 		logGlobal->errorStream() << "Possible reasons:";
@@ -392,20 +392,20 @@ int main(int argc, char** argv)
 
 	if(!settings["session"]["headless"].Bool())
 	{
-		if(SDL_Init(SDL_INIT_VIDEO|SDL_INIT_TIMER|SDL_INIT_AUDIO|SDL_INIT_NOPARACHUTE))
+		if(SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER | SDL_INIT_AUDIO | SDL_INIT_NOPARACHUTE))
 		{
-			logGlobal->errorStream()<<"Something was wrong: "<< SDL_GetError();
+			logGlobal->errorStream() << "Something was wrong: " << SDL_GetError();
 			exit(-1);
 		}
 
-		#ifdef VCMI_ANDROID
+#ifdef VCMI_ANDROID
 		// manually setting egl pixel format, as a possible solution for sdl2<->android problem
 		// https://bugzilla.libsdl.org/show_bug.cgi?id=2291
 		SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 5);
 		SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 6);
 		SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 5);
 		SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 0);
-		#endif // VCMI_ANDROID
+#endif // VCMI_ANDROID
 
 		GH.mainFPSmng->init(); //(!)init here AFTER SDL_Init() while using SDL for FPS management
 
@@ -419,7 +419,7 @@ int main(int argc, char** argv)
 		for(int it = 0; it < driversCount; it++)
 		{
 			SDL_RendererInfo info;
-			SDL_GetRenderDriverInfo(it,&info);
+			SDL_GetRenderDriverInfo(it, &info);
 
 			std::string driverName(info.name);
 
@@ -433,28 +433,25 @@ int main(int argc, char** argv)
 		}
 
 		config::CConfigHandler::GuiOptionsMap::key_type resPair(res["width"].Float(), res["height"].Float());
-		if (conf.guiOptions.count(resPair) == 0)
+		if(conf.guiOptions.count(resPair) == 0)
 		{
 			// selected resolution was not found - complain & fallback to something that we do have.
 			logGlobal->errorStream() << "Selected resolution " << resPair.first << "x" << resPair.second << " was not found!";
-			if (conf.guiOptions.empty())
+			if(conf.guiOptions.empty())
 			{
 				logGlobal->errorStream() << "Unable to continue - no valid resolutions found! Please reinstall VCMI to fix this";
 				exit(1);
 			}
-			else
-			{
-				Settings newRes = settings.write["video"]["screenRes"];
-				newRes["width"].Float()  = conf.guiOptions.begin()->first.first;
-				newRes["height"].Float() = conf.guiOptions.begin()->first.second;
-				conf.SetResolution(newRes["width"].Float(), newRes["height"].Float());
+			Settings newRes = settings.write["video"]["screenRes"];
+			newRes["width"].Float() = conf.guiOptions.begin()->first.first;
+			newRes["height"].Float() = conf.guiOptions.begin()->first.second;
+			conf.SetResolution(newRes["width"].Float(), newRes["height"].Float());
 
-				logGlobal->errorStream() << "Falling back to " << newRes["width"].Float() << "x" << newRes["height"].Float();
-			}
+			logGlobal->errorStream() << "Falling back to " << newRes["width"].Float() << "x" << newRes["height"].Float();
 		}
 
 		setScreenRes(res["width"].Float(), res["height"].Float(), video["bitsPerPixel"].Float(), video["fullscreen"].Bool(), video["displayIndex"].Float());
-		logGlobal->infoStream() <<"\tInitializing screen: "<<pomtime.getDiff();
+		logGlobal->infoStream() << "\tInitializing screen: " << pomtime.getDiff();
 	}
 
 	CCS = new CClientState;
@@ -463,13 +460,13 @@ int main(int argc, char** argv)
 #ifdef DISABLE_VIDEO
 	CCS->videoh = new CEmptyVideoPlayer;
 #else
-	if (!settings["session"]["headless"].Bool() && !vm.count("disable-video"))
+	if(!settings["session"]["headless"].Bool() && !vm.count("disable-video"))
 		CCS->videoh = new CVideoPlayer;
 	else
 		CCS->videoh = new CEmptyVideoPlayer;
 #endif
 
-	logGlobal->infoStream()<<"\tInitializing video: "<<pomtime.getDiff();
+	logGlobal->infoStream() << "\tInitializing video: " << pomtime.getDiff();
 
 	//initializing audio
 	CCS->soundh = new CSoundHandler;
@@ -478,7 +475,7 @@ int main(int argc, char** argv)
 	CCS->musich = new CMusicHandler;
 	CCS->musich->init();
 	CCS->musich->setVolume(settings["general"]["music"].Float());
-	logGlobal->infoStream()<<"Initializing screen and sound handling: "<<pomtime.getDiff();
+	logGlobal->infoStream() << "Initializing screen and sound handling: " << pomtime.getDiff();
 
 #ifdef __APPLE__
 	// Ctrl+click should be treated as a right click on Mac OS X
@@ -501,20 +498,20 @@ int main(int argc, char** argv)
 	}
 	SDL_RenderPresent(mainRenderer);
 #ifndef VCMI_NO_THREADED_LOAD
-	#ifdef VCMI_ANDROID // android loads the data quite slowly so we display native progressbar to prevent having only black screen for few seconds
+#ifdef VCMI_ANDROID // android loads the data quite slowly so we display native progressbar to prevent having only black screen for few seconds
 	{
 		CAndroidVMHelper vmHelper;
 		vmHelper.callStaticVoidMethod(CAndroidVMHelper::NATIVE_METHODS_DEFAULT_CLASS, "showProgress");
-	#endif // ANDROID
-		loading.join();
-	#ifdef VCMI_ANDROID
+#endif // ANDROID
+	loading.join();
+#ifdef VCMI_ANDROID
 		vmHelper.callStaticVoidMethod(CAndroidVMHelper::NATIVE_METHODS_DEFAULT_CLASS, "hideProgress");
 	}
-	#endif // ANDROID
+#endif // ANDROID
 #endif // THREADED
-	logGlobal->infoStream()<<"Initialization of VCMI (together): "<<total.getDiff();
+	logGlobal->infoStream() << "Initialization of VCMI (together): " << total.getDiff();
 
-	session["autoSkip"].Bool()  = vm.count("autoSkip");
+	session["autoSkip"].Bool() = vm.count("autoSkip");
 	session["oneGoodAI"].Bool() = vm.count("oneGoodAI");
 	session["aiSolo"].Bool() = false;
 
@@ -543,7 +540,7 @@ int main(int argc, char** argv)
 	}
 	else
 	{
-		if(!fileToStartFrom.empty() && bfs::exists(fileToStartFrom))
+		if(!fileToStartFrom.empty() && exists(fileToStartFrom))
 			startGameFromFile(fileToStartFrom); //ommit pregame and start the game using settings from file
 		else
 		{
@@ -569,13 +566,13 @@ int main(int argc, char** argv)
 	return 0;
 }
 
-void printInfoAboutIntObject(const CIntObject *obj, int level)
+void printInfoAboutIntObject(const CIntObject * obj, int level)
 {
 	std::stringstream sbuffer;
 	sbuffer << std::string(level, '\t');
 
 	sbuffer << typeid(*obj).name() << " *** ";
-	if (obj->active)
+	if(obj->active)
 	{
 #define PRINT(check, text) if (obj->active & CIntObject::check) sbuffer << text
 		PRINT(LCLICK, 'L');
@@ -591,12 +588,12 @@ void printInfoAboutIntObject(const CIntObject *obj, int level)
 	}
 	else
 		sbuffer << "inactive";
-	sbuffer << " at " << obj->pos.x <<"x"<< obj->pos.y;
-	sbuffer << " (" << obj->pos.w <<"x"<< obj->pos.h << ")";
+	sbuffer << " at " << obj->pos.x << "x" << obj->pos.y;
+	sbuffer << " (" << obj->pos.w << "x" << obj->pos.h << ")";
 	logGlobal->infoStream() << sbuffer.str();
 
-	for(const CIntObject *child : obj->children)
-		printInfoAboutIntObject(child, level+1);
+	for(const CIntObject * child : obj->children)
+		printInfoAboutIntObject(child, level + 1);
 }
 
 void removeGUI()
@@ -613,16 +610,16 @@ void removeGUI()
 	LOCPLINT = nullptr;
 };
 
-void processCommand(const std::string &message)
+void processCommand(const std::string & message)
 {
 	std::istringstream readed;
 	readed.str(message);
 	std::string cn; //command name
 	readed >> cn;
 
-// Check mantis issue 2292 for details
-//	if(LOCPLINT && LOCPLINT->cingconsole)
-//		LOCPLINT->cingconsole->print(message);
+	// Check mantis issue 2292 for details
+	//	if(LOCPLINT && LOCPLINT->cingconsole)
+	//		LOCPLINT->cingconsole->print(message);
 
 	if(ermInteractiveMode)
 	{
@@ -631,14 +628,11 @@ void processCommand(const std::string &message)
 			ermInteractiveMode = false;
 			return;
 		}
-		else
-		{
-			if(client && client->erm)
-				client->erm->executeUserCommand(message);
-			std::cout << "erm>";
-		}
+		if(client && client->erm)
+			client->erm->executeUserCommand(message);
+		std::cout << "erm>";
 	}
-	else if(message==std::string("die, fool"))
+	else if(message == std::string("die, fool"))
 	{
 		exit(EXIT_SUCCESS);
 	}
@@ -647,11 +641,11 @@ void processCommand(const std::string &message)
 		ermInteractiveMode = true;
 		std::cout << "erm>";
 	}
-	else if(cn==std::string("activate"))
+	else if(cn == std::string("activate"))
 	{
 		int what;
 		readed >> what;
-		switch (what)
+		switch(what)
 		{
 		case 0:
 			GH.topInt()->activate();
@@ -664,11 +658,11 @@ void processCommand(const std::string &message)
 			break;
 		}
 	}
-	else if(cn=="redraw")
+	else if(cn == "redraw")
 	{
 		GH.totalRedraw();
 	}
-	else if(cn=="screen")
+	else if(cn == "screen")
 	{
 		std::cout << "Screenbuf points to ";
 
@@ -682,7 +676,7 @@ void processCommand(const std::string &message)
 		SDL_SaveBMP(screen, "Screen_c.bmp");
 		SDL_SaveBMP(screen2, "Screen2_c.bmp");
 	}
-	else if(cn=="save")
+	else if(cn == "save")
 	{
 		if(!client)
 		{
@@ -693,14 +687,14 @@ void processCommand(const std::string &message)
 		readed >> fname;
 		client->save(fname);
 	}
-//	else if(cn=="load")
-//	{
-//		// TODO: this code should end the running game and manage to call startGame instead
-//		std::string fname;
-//		readed >> fname;
-//		client->loadGame(fname);
-//	}
-	else if(message=="get txt")
+	//	else if(cn=="load")
+	//	{
+	//		// TODO: this code should end the running game and manage to call startGame instead
+	//		std::string fname;
+	//		readed >> fname;
+	//		client->loadGame(fname);
+	//	}
+	else if(message == "get txt")
 	{
 		std::cout << "Command accepted.\t";
 
@@ -712,11 +706,11 @@ void processCommand(const std::string &message)
 			return ident.getType() == EResType::TEXT && boost::algorithm::starts_with(ident.getName(), "DATA/");
 		});
 
-		for (auto & filename : list)
+		for(auto & filename : list)
 		{
 			const bfs::path filePath = outPath / (filename.getName() + ".TXT");
 
-			bfs::create_directories(filePath.parent_path());
+			create_directories(filePath.parent_path());
 
 			bfs::ofstream file(filePath);
 			auto text = CResourceHandler::get()->load(filename)->readAll();
@@ -727,15 +721,15 @@ void processCommand(const std::string &message)
 		std::cout << "\rExtracting done :)\n";
 		std::cout << " Extracted files can be found in " << outPath << " directory\n";
 	}
-	else if(cn=="crash")
+	else if(cn == "crash")
 	{
-		int *ptr = nullptr;
+		int * ptr = nullptr;
 		*ptr = 666;
 		//disaster!
 	}
 	else if(cn == "mp" && adventureInt)
 	{
-		if(const CGHeroInstance *h = dynamic_cast<const CGHeroInstance *>(adventureInt->selection))
+		if(const CGHeroInstance * h = dynamic_cast<const CGHeroInstance *>(adventureInt->selection))
 			std::cout << h->movement << "; max: " << h->maxMovePoints(true) << "/" << h->maxMovePoints(false) << std::endl;
 	}
 	else if(cn == "bonuses")
@@ -746,7 +740,7 @@ void processCommand(const std::string &message)
 		std::cout << "\nInherited bonuses:\n";
 		TCNodes parents;
 		adventureInt->selection->getParents(parents);
-		for(const CBonusSystemNode *parent : parents)
+		for(const CBonusSystemNode * parent : parents)
 		{
 			std::cout << "\nBonuses from " << typeid(*parent).name() << std::endl << parent->getBonusList() << std::endl;
 		}
@@ -757,28 +751,28 @@ void processCommand(const std::string &message)
 	}
 	else if(cn == "gui")
 	{
-		for(const IShowActivatable *child : GH.listInt)
+		for(const IShowActivatable * child : GH.listInt)
 		{
-			if(const CIntObject *obj = dynamic_cast<const CIntObject *>(child))
+			if(const CIntObject * obj = dynamic_cast<const CIntObject *>(child))
 				printInfoAboutIntObject(obj, 0);
 			else
 				std::cout << typeid(*child).name() << std::endl;
 		}
 	}
-	else if(cn=="tell")
+	else if(cn == "tell")
 	{
 		std::string what;
 		int id1, id2;
 		readed >> what >> id1 >> id2;
 		if(what == "hs")
 		{
-			for(const CGHeroInstance *h : LOCPLINT->cb->getHeroesInfo())
+			for(const CGHeroInstance * h : LOCPLINT->cb->getHeroesInfo())
 				if(h->type->ID.getNum() == id1)
-					if(const CArtifactInstance *a = h->getArt(ArtifactPosition(id2)))
+					if(const CArtifactInstance * a = h->getArt(ArtifactPosition(id2)))
 						std::cout << a->nodeName();
 		}
 	}
-	else if (cn == "set")
+	else if(cn == "set")
 	{
 		std::string what, value;
 		readed >> what;
@@ -787,12 +781,12 @@ void processCommand(const std::string &message)
 
 		readed >> value;
 
-		if (value == "on")
+		if(value == "on")
 		{
 			conf->Bool() = true;
 			logGlobal->info("Option %s enabled!", what);
 		}
-		else if (value == "off")
+		else if(value == "off")
 		{
 			conf->Bool() = false;
 			logGlobal->info("Option %s disabled!", what);
@@ -834,13 +828,13 @@ void processCommand(const std::string &message)
 		std::string URI;
 		readed >> URI;
 
-		if (CResourceHandler::get()->existsResource(ResourceID(URI)))
+		if(CResourceHandler::get()->existsResource(ResourceID(URI)))
 		{
 			const bfs::path outPath = VCMIDirs::get().userCachePath() / "extracted" / URI;
 
 			auto data = CResourceHandler::get()->load(ResourceID(URI))->readAll();
 
-			bfs::create_directories(outPath.parent_path());
+			create_directories(outPath.parent_path());
 			bfs::ofstream outFile(outPath, bfs::ofstream::binary);
 			outFile.write((char*)data.first.get(), data.second);
 		}
@@ -861,7 +855,7 @@ void processCommand(const std::string &message)
 				std::cout << "Setting changed, from now the battle ai will be " << fname << "!\n";
 			}
 		}
-		catch(std::exception &e)
+		catch(std::exception & e)
 		{
 			logGlobal->warnStream() << "Failed opening " << fname << ": " << e.what();
 			logGlobal->warnStream() << "Setting not changes, AI not found or invalid!";
@@ -947,11 +941,11 @@ void processCommand(const std::string &message)
 			giveTurn(color);
 	}
 	// Check mantis issue 2292 for details
-/* 	else if(client && client->serv && client->serv->connected && LOCPLINT) //send to server
-	{
-		boost::unique_lock<boost::recursive_mutex> un(*CPlayerInterface::pim);
-		LOCPLINT->cb->sendMessage(message);
-	}*/
+	/* 	else if(client && client->serv && client->serv->connected && LOCPLINT) //send to server
+		{
+			boost::unique_lock<boost::recursive_mutex> un(*CPlayerInterface::pim);
+			LOCPLINT->cb->sendMessage(message);
+		}*/
 }
 
 //plays intro, ends when intro is over or button has been pressed (handles events)
@@ -994,7 +988,7 @@ static bool checkVideoMode(int monitorIndex, int w, int h)
 	//we only check that our desired window size fits on screen
 	SDL_DisplayMode mode;
 
-	if (0 != SDL_GetDesktopDisplayMode(monitorIndex, &mode))
+	if(0 != SDL_GetDesktopDisplayMode(monitorIndex, &mode))
 	{
 		logGlobal->error("SDL_GetDesktopDisplayMode failed");
 		logGlobal->error(SDL_GetError());
@@ -1003,7 +997,7 @@ static bool checkVideoMode(int monitorIndex, int w, int h)
 
 	logGlobal->info("Check display mode: requested %d x %d; available up to %d x %d ", w, h, mode.w, mode.h);
 
-	if (!mode.w || !mode.h || (w <= mode.w && h <= mode.h))
+	if(!mode.w || !mode.h || (w <= mode.w && h <= mode.h))
 	{
 		return true;
 	}
@@ -1051,14 +1045,14 @@ static bool recreateWindow(int w, int h, int bpp, bool fullscreen, int displayIn
 	// VCMI will only work with 2 or 4 bytes per pixel
 	vstd::amax(bpp, 16);
 	vstd::amin(bpp, 32);
-	if(bpp>16)
+	if(bpp > 16)
 		bpp = 32;
 
 	if(displayIndex < 0)
 	{
-		if (mainWindow != nullptr)
+		if(mainWindow != nullptr)
 			displayIndex = SDL_GetWindowDisplayIndex(mainWindow);
-		if (displayIndex < 0)
+		if(displayIndex < 0)
 			displayIndex = 0;
 	}
 	if(!checkVideoMode(displayIndex, w, h))
@@ -1093,7 +1087,7 @@ static bool recreateWindow(int w, int h, int bpp, bool fullscreen, int displayIn
 
 
 	//create first available renderer if preferred not set. Use no flags, so HW accelerated will be preferred but SW renderer also will possible
-	mainRenderer = SDL_CreateRenderer(mainWindow,preferredDriverIndex,0);
+	mainRenderer = SDL_CreateRenderer(mainWindow, preferredDriverIndex, 0);
 
 	if(nullptr == mainRenderer)
 	{
@@ -1101,35 +1095,34 @@ static bool recreateWindow(int w, int h, int bpp, bool fullscreen, int displayIn
 	}
 
 	SDL_RendererInfo info;
-	SDL_GetRendererInfo(mainRenderer,&info);
+	SDL_GetRendererInfo(mainRenderer, &info);
 	logGlobal->infoStream() << "Created renderer " << info.name;
 
 	SDL_RenderSetLogicalSize(mainRenderer, w, h);
 
 #ifndef VCMI_ANDROID
-    // on android this stretches the game to fit the screen, not preserving aspect and apparently this also breaks coordinates scaling in mouse events
+	// on android this stretches the game to fit the screen, not preserving aspect and apparently this also breaks coordinates scaling in mouse events
 	SDL_RenderSetViewport(mainRenderer, nullptr);
 #endif
 
 
-
-	#if (SDL_BYTEORDER == SDL_BIG_ENDIAN)
+#if (SDL_BYTEORDER == SDL_BIG_ENDIAN)
 		int bmask = 0xff000000;
 		int gmask = 0x00ff0000;
 		int rmask = 0x0000ff00;
 		int amask = 0x000000ff;
-	#else
-		int bmask = 0x000000ff;
-		int gmask = 0x0000ff00;
-		int rmask = 0x00ff0000;
-		int amask = 0xFF000000;
-	#endif
+#else
+	int bmask = 0x000000ff;
+	int gmask = 0x0000ff00;
+	int rmask = 0x00ff0000;
+	int amask = 0xFF000000;
+#endif
 
-	screen = SDL_CreateRGBSurface(0,w,h,bpp,rmask,gmask,bmask,amask);
+	screen = SDL_CreateRGBSurface(0, w, h, bpp, rmask, gmask, bmask, amask);
 	if(nullptr == screen)
 	{
 		logGlobal->errorStream() << "Unable to create surface";
-		logGlobal->errorStream() << w << " "<<  h << " "<< bpp;
+		logGlobal->errorStream() << w << " " << h << " " << bpp;
 
 		logGlobal->errorStream() << SDL_GetError();
 		throw std::runtime_error("Unable to create surface");
@@ -1138,9 +1131,9 @@ static bool recreateWindow(int w, int h, int bpp, bool fullscreen, int displayIn
 	SDL_SetSurfaceBlendMode(screen, SDL_BLENDMODE_NONE);
 
 	screenTexture = SDL_CreateTexture(mainRenderer,
-                                            SDL_PIXELFORMAT_ARGB8888,
-                                            SDL_TEXTUREACCESS_STREAMING,
-                                            w, h);
+	                                  SDL_PIXELFORMAT_ARGB8888,
+	                                  SDL_TEXTUREACCESS_STREAMING,
+	                                  w, h);
 
 	if(nullptr == screenTexture)
 	{
@@ -1198,7 +1191,7 @@ static void fullScreenChanged()
 
 static void handleEvent(SDL_Event & ev)
 {
-	if((ev.type==SDL_QUIT) ||(ev.type == SDL_KEYDOWN && ev.key.keysym.sym==SDLK_F4 && (ev.key.keysym.mod & KMOD_ALT)))
+	if((ev.type == SDL_QUIT) || (ev.type == SDL_KEYDOWN && ev.key.keysym.sym == SDLK_F4 && (ev.key.keysym.mod & KMOD_ALT)))
 	{
 #ifdef VCMI_ANDROID
 		handleQuit(false);
@@ -1213,13 +1206,13 @@ static void handleEvent(SDL_Event & ev)
 		handleQuit(true);
 	}
 #endif
-	else if(ev.type == SDL_KEYDOWN && ev.key.keysym.sym==SDLK_F4)
+	if(ev.type == SDL_KEYDOWN && ev.key.keysym.sym == SDLK_F4)
 	{
 		Settings full = settings.write["video"]["fullscreen"];
 		full->Bool() = !full->Bool();
 		return;
 	}
-	else if(ev.type == SDL_USEREVENT)
+	if(ev.type == SDL_USEREVENT)
 	{
 		switch(ev.user.code)
 		{
@@ -1228,7 +1221,7 @@ static void handleEvent(SDL_Event & ev)
 				handleQuit(false);
 				return;
 			}
-		    break;
+			break;
 		case RETURN_TO_MAIN_MENU:
 			{
 				endGame();
@@ -1269,9 +1262,10 @@ static void handleEvent(SDL_Event & ev)
 
 		return;
 	}
-	else if(ev.type == SDL_WINDOWEVENT)
+	if(ev.type == SDL_WINDOWEVENT)
 	{
-		switch (ev.window.event) {
+		switch(ev.window.event)
+		{
 		case SDL_WINDOWEVENT_RESTORED:
 			fullScreenChanged();
 			break;
@@ -1282,19 +1276,18 @@ static void handleEvent(SDL_Event & ev)
 		boost::unique_lock<boost::mutex> lock(eventsM);
 		events.push(ev);
 	}
-
 }
 
 
 static void mainLoop()
 {
 	SettingsListener resChanged = settings.listen["video"]["fullscreen"];
-	resChanged([](const JsonNode &newState){  CGuiHandler::pushSDLEvent(SDL_USEREVENT, FULLSCREEN_TOGGLED); });
+	resChanged([](const JsonNode & newState) { CGuiHandler::pushSDLEvent(SDL_USEREVENT, FULLSCREEN_TOGGLED); });
 
 	inGuiThread.reset(new bool(true));
 	GH.mainFPSmng->init();
 
-	while(1) //main SDL events loop
+	while(true) //main SDL events loop
 	{
 		SDL_Event ev;
 
@@ -1304,11 +1297,10 @@ static void mainLoop()
 		}
 
 		GH.renderFrame();
-
 	}
 }
 
-void startGame(StartInfo * options, CConnection *serv/* = nullptr*/)
+void startGame(StartInfo * options, CConnection * serv/* = nullptr*/)
 {
 	if(!settings["session"]["donotstartserver"].Bool())
 	{
@@ -1331,7 +1323,7 @@ void startGame(StartInfo * options, CConnection *serv/* = nullptr*/)
 		}
 	}
 
-    client = new CClient();
+	client = new CClient();
 	CPlayerInterface::howManyPeople = 0;
 	switch(options->mode) //new game
 	{
@@ -1341,11 +1333,11 @@ void startGame(StartInfo * options, CConnection *serv/* = nullptr*/)
 		break;
 	case StartInfo::LOAD_GAME:
 		std::string fname = options->mapname;
-		boost::algorithm::erase_last(fname,".vlgm1");
-        if(!vm.count("loadplayer"))
-            client->loadGame(fname);
-        else
-			client->loadGame(fname,vm.count("loadserver"),vm.count("loadhumanplayerindices") ? vm["loadhumanplayerindices"].as<std::vector<int>>() : std::vector<int>(),vm.count("loadnumplayers") ? vm["loadnumplayers"].as<int>() : 1,vm["loadplayer"].as<int>(),vm.count("loadserverip") ? vm["loadserverip"].as<std::string>() : "", vm.count("loadserverport") ? vm["loadserverport"].as<ui16>() : CServerHandler::getDefaultPort());
+		boost::algorithm::erase_last(fname, ".vlgm1");
+		if(!vm.count("loadplayer"))
+			client->loadGame(fname);
+		else
+			client->loadGame(fname, vm.count("loadserver"), vm.count("loadhumanplayerindices") ? vm["loadhumanplayerindices"].as<std::vector<int>>() : std::vector<int>(), vm.count("loadnumplayers") ? vm["loadnumplayers"].as<int>() : 1, vm["loadplayer"].as<int>(), vm.count("loadserverip") ? vm["loadserverip"].as<std::string>() : "", vm.count("loadserverport") ? vm["loadserverport"].as<ui16>() : CServerHandler::getDefaultPort());
 		break;
 	}
 

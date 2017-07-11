@@ -27,23 +27,23 @@
 
 void CButton::update()
 {
-	if (overlay)
+	if(overlay)
 	{
-		if (state == PRESSED)
-			overlay->moveTo(overlay->pos.centerIn(pos).topLeft() + Point(1,1));
+		if(state == PRESSED)
+			overlay->moveTo(overlay->pos.centerIn(pos).topLeft() + Point(1, 1));
 		else
 			overlay->moveTo(overlay->pos.centerIn(pos).topLeft());
 	}
 
 	int newPos = stateToIndex[int(state)];
-	if (newPos < 0)
+	if(newPos < 0)
 		newPos = 0;
 
-	if (state == HIGHLIGHTED && image->size() < 4)
-		newPos = image->size()-1;
+	if(state == HIGHLIGHTED && image->size() < 4)
+		newPos = image->size() - 1;
 	image->setFrame(newPos);
 
-	if (active)
+	if(active)
 		redraw();
 }
 
@@ -52,14 +52,14 @@ void CButton::addCallback(std::function<void()> callback)
 	this->callback += callback;
 }
 
-void CButton::addTextOverlay( const std::string &Text, EFonts font, SDL_Color color)
+void CButton::addTextOverlay(const std::string & Text, EFonts font, SDL_Color color)
 {
 	OBJ_CONSTRUCTION_CAPTURING_ALL;
-	addOverlay(new CLabel(pos.w/2, pos.h/2, font, CENTER, color, Text));
+	addOverlay(new CLabel(pos.w / 2, pos.h / 2, font, CENTER, color, Text));
 	update();
 }
 
-void CButton::addOverlay(CIntObject *newOverlay)
+void CButton::addOverlay(CIntObject * newOverlay)
 {
 	delete overlay;
 	overlay = newOverlay;
@@ -89,7 +89,7 @@ void CButton::setImageOrder(int state1, int state2, int state3, int state4)
 
 void CButton::setState(ButtonState newState)
 {
-	if (state == newState)
+	if(state == newState)
 		return;
 	state = newState;
 	update();
@@ -122,7 +122,7 @@ void CButton::onButtonClicked()
 	logAnim->traceStream() << "Button clicked at " << pos.x << "x" << pos.y;
 	CIntObject * parent = this->parent;
 	std::string prefix = "Parent is";
-	while (parent)
+	while(parent)
 	{
 		logAnim->traceStream() << prefix << typeid(*parent).name() << " at " << parent->pos.x << "x" << parent->pos.y;
 		parent = parent->parent;
@@ -136,9 +136,9 @@ void CButton::clickLeft(tribool down, bool previousState)
 	if(isBlocked())
 		return;
 
-	if (down)
+	if(down)
 	{
-		if (!soundDisabled)
+		if(!soundDisabled)
 			CCS->soundh->playSound(soundBase::button);
 		setState(PRESSED);
 	}
@@ -147,11 +147,11 @@ void CButton::clickLeft(tribool down, bool previousState)
 	else
 		setState(NORMAL);
 
-	if (actOnDown && down)
+	if(actOnDown && down)
 	{
 		onButtonClicked();
 	}
-	else if (!actOnDown && previousState && (down==false))
+	else if(!actOnDown && previousState && (down == false))
 	{
 		onButtonClicked();
 	}
@@ -163,7 +163,7 @@ void CButton::clickRight(tribool down, bool previousState)
 		CRClickPopup::createAndPush(helpBox);
 }
 
-void CButton::hover (bool on)
+void CButton::hover(bool on)
 {
 	if(hoverable && !isBlocked())
 	{
@@ -177,19 +177,19 @@ void CButton::hover (bool on)
 		setState(PRESSED);*/
 
 	std::string name = hoverTexts[getState()].empty()
-		? hoverTexts[0]
-		: hoverTexts[getState()];
+		                   ? hoverTexts[0]
+		                   : hoverTexts[getState()];
 
 	if(!name.empty() && !isBlocked()) //if there is no name, there is nothing to display also
 	{
-		if (LOCPLINT && LOCPLINT->battleInt) //for battle buttons
+		if(LOCPLINT && LOCPLINT->battleInt) //for battle buttons
 		{
 			if(on && LOCPLINT->battleInt->console->alterTxt == "")
 			{
 				LOCPLINT->battleInt->console->alterTxt = name;
 				LOCPLINT->battleInt->console->whoSetAlter = 1;
 			}
-			else if (LOCPLINT->battleInt->console->alterTxt == name)
+			else if(LOCPLINT->battleInt->console->alterTxt == name)
 			{
 				LOCPLINT->battleInt->console->alterTxt = "";
 				LOCPLINT->battleInt->console->whoSetAlter = 0;
@@ -197,17 +197,17 @@ void CButton::hover (bool on)
 		}
 		else if(GH.statusbar) //for other buttons
 		{
-			if (on)
+			if(on)
 				GH.statusbar->setText(name);
-			else if ( GH.statusbar->getText()==(name) )
+			else if(GH.statusbar->getText() == (name))
 				GH.statusbar->clear();
 		}
 	}
 }
 
-CButton::CButton(Point position, const std::string &defName, const std::pair<std::string, std::string> &help, CFunctionList<void()> Callback, int key, bool playerColoredButton):
-    CKeyShortcut(key),
-    callback(Callback)
+CButton::CButton(Point position, const std::string & defName, const std::pair<std::string, std::string> & help, CFunctionList<void()> Callback, int key, bool playerColoredButton):
+	CKeyShortcut(key),
+	callback(Callback)
 {
 	addUsedEvents(LCLICK | RCLICK | HOVER | KEYBOARD);
 
@@ -216,19 +216,19 @@ CButton::CButton(Point position, const std::string &defName, const std::pair<std
 	stateToIndex[2] = 2;
 	stateToIndex[3] = 3;
 
-	state=NORMAL;
+	state = NORMAL;
 	image = nullptr;
 	overlay = nullptr;
 
 	currentImage = -1;
 	hoverable = actOnDown = soundDisabled = false;
 	hoverTexts[0] = help.first;
-	helpBox=help.second;
+	helpBox = help.second;
 
 	pos.x += position.x;
 	pos.y += position.y;
 
-	if (!defName.empty())
+	if(!defName.empty())
 	{
 		imageNames.push_back(defName);
 		setIndex(0, playerColoredButton);
@@ -237,7 +237,7 @@ CButton::CButton(Point position, const std::string &defName, const std::pair<std
 
 void CButton::setIndex(size_t index, bool playerColoredButton)
 {
-	if (index == currentImage || index>=imageNames.size())
+	if(index == currentImage || index >= imageNames.size())
 		return;
 	currentImage = index;
 	auto anim = std::make_shared<CAnimation>(imageNames[index]);
@@ -249,14 +249,14 @@ void CButton::setImage(std::shared_ptr<CAnimation> anim, bool playerColoredButto
 	OBJ_CONSTRUCTION_CAPTURING_ALL;
 
 	image = new CAnimImage(anim, getState(), 0, 0, 0, animFlags);
-	if (playerColoredButton)
+	if(playerColoredButton)
 		image->playerColored(LOCPLINT->playerID);
 	pos = image->pos;
 }
 
 void CButton::setPlayerColor(PlayerColor player)
 {
-	if (image)
+	if(image)
 		image->playerColored(player);
 }
 
@@ -264,8 +264,8 @@ void CButton::showAll(SDL_Surface * to)
 {
 	CIntObject::showAll(to);
 
-	if (borderColor && borderColor->a == 0)
-		CSDL_Ext::drawBorder(to, pos.x-1, pos.y-1, pos.w+2, pos.h+2, int3(borderColor->r, borderColor->g, borderColor->b));
+	if(borderColor && borderColor->a == 0)
+		CSDL_Ext::drawBorder(to, pos.x - 1, pos.y - 1, pos.w + 2, pos.h + 2, int3(borderColor->r, borderColor->g, borderColor->b));
 }
 
 std::pair<std::string, std::string> CButton::tooltip()
@@ -275,18 +275,18 @@ std::pair<std::string, std::string> CButton::tooltip()
 
 std::pair<std::string, std::string> CButton::tooltip(const JsonNode & localizedTexts)
 {
-	return std::make_pair(localizedTexts["label"].String(), localizedTexts["help"].String());
+	return make_pair(localizedTexts["label"].String(), localizedTexts["help"].String());
 }
 
 std::pair<std::string, std::string> CButton::tooltip(const std::string & hover, const std::string & help)
 {
-	return std::make_pair(hover, help);
+	return make_pair(hover, help);
 }
 
 CToggleBase::CToggleBase(CFunctionList<void (bool)> callback):
-    callback(callback),
-    selected(false),
-    allowDeselection(true)
+	callback(callback),
+	selected(false),
+	allowDeselection(true)
 {
 }
 
@@ -304,13 +304,13 @@ void CToggleBase::setSelected(bool on)
 	bool changed = (on != selected);
 	selected = on;
 	doSelect(on);
-	if (changed)
+	if(changed)
 		callback(on);
 }
 
 bool CToggleBase::canActivate()
 {
-	if (selected && !allowDeselection)
+	if(selected && !allowDeselection)
 		return false;
 	return true;
 }
@@ -320,17 +320,17 @@ void CToggleBase::addCallback(std::function<void(bool)> function)
 	callback += function;
 }
 
-CToggleButton::CToggleButton(Point position, const std::string &defName, const std::pair<std::string, std::string> &help,
+CToggleButton::CToggleButton(Point position, const std::string & defName, const std::pair<std::string, std::string> & help,
                              CFunctionList<void(bool)> callback, int key, bool playerColoredButton):
-  CButton(position, defName, help, 0, key, playerColoredButton),
-  CToggleBase(callback)
+	CButton(position, defName, help, 0, key, playerColoredButton),
+	CToggleBase(callback)
 {
 	allowDeselection = true;
 }
 
 void CToggleButton::doSelect(bool on)
 {
-	if (on)
+	if(on)
 	{
 		setState(HIGHLIGHTED);
 	}
@@ -349,7 +349,7 @@ void CToggleButton::clickLeft(tribool down, bool previousState)
 	if(isBlocked())
 		return;
 
-	if (down && canActivate())
+	if(down && canActivate())
 	{
 		CCS->soundh->playSound(soundBase::button);
 		setState(PRESSED);
@@ -372,25 +372,26 @@ void CToggleGroup::addCallback(std::function<void(int)> callback)
 	onChange += callback;
 }
 
-void CToggleGroup::addToggle(int identifier, CToggleBase* bt)
+void CToggleGroup::addToggle(int identifier, CToggleBase * bt)
 {
-	if (auto intObj = dynamic_cast<CIntObject*>(bt)) // hack-ish workagound to avoid diamond problem with inheritance
+	if(auto intObj = dynamic_cast<CIntObject*>(bt)) // hack-ish workagound to avoid diamond problem with inheritance
 	{
-		if (intObj->parent)
+		if(intObj->parent)
 			intObj->parent->removeChild(intObj);
 		addChild(intObj);
 	}
 
-	bt->addCallback([=] (bool on) { if (on) selectionChanged(identifier);});
+	bt->addCallback([=] (bool on) { if(on) selectionChanged(identifier); });
 	bt->allowDeselection = false;
 
 	assert(buttons[identifier] == nullptr);
 	buttons[identifier] = bt;
 }
 
-CToggleGroup::CToggleGroup(const CFunctionList<void(int)> &OnChange)
-: onChange(OnChange), selectedID(-2)
-{}
+CToggleGroup::CToggleGroup(const CFunctionList<void(int)> & OnChange)
+	: onChange(OnChange), selectedID(-2)
+{
+}
 
 void CToggleGroup::setSelected(int id)
 {
@@ -399,31 +400,31 @@ void CToggleGroup::setSelected(int id)
 
 void CToggleGroup::selectionChanged(int to)
 {
-	if (to == selectedID)
+	if(to == selectedID)
 		return;
 
 	int oldSelection = selectedID;
 	selectedID = to;
 
-	if (buttons.count(oldSelection))
+	if(buttons.count(oldSelection))
 		buttons[oldSelection]->setSelected(false);
 
-	if (buttons.count(to))
+	if(buttons.count(to))
 		buttons[to]->setSelected(true);
 
 	onChange(to);
-	if (parent)
+	if(parent)
 		parent->redraw();
 }
 
-CVolumeSlider::CVolumeSlider(const Point &position, const std::string &defName, const int value,
+CVolumeSlider::CVolumeSlider(const Point & position, const std::string & defName, const int value,
                              const std::pair<std::string, std::string> * const help) :
 	value(value),
 	helpHandlers(help)
 {
 	OBJ_CONSTRUCTION_CAPTURING_ALL;
-	animImage = new CAnimImage(std::make_shared<CAnimation>(defName), 0, 0, position.x, position.y),
-	assert(!defName.empty());
+	animImage = new CAnimImage(std::make_shared<CAnimation>(defName), 0, 0, position.x, position.y) ,
+		assert(!defName.empty());
 	addUsedEvents(LCLICK | RCLICK | WHEEL);
 	pos.x += position.x;
 	pos.y += position.y;
@@ -444,7 +445,7 @@ void CVolumeSlider::moveTo(int id)
 	vstd::abetween(id, 0, animImage->size() - 1);
 	animImage->setFrame(id);
 	animImage->moveTo(Point(pos.x + (animImage->pos.w + 1) * id, pos.y));
-	if (active)
+	if(active)
 		redraw();
 }
 
@@ -455,7 +456,7 @@ void CVolumeSlider::addCallback(std::function<void(int)> callback)
 
 void CVolumeSlider::clickLeft(tribool down, bool previousState)
 {
-	if (down)
+	if(down)
 	{
 		double px = GH.current->motion.x - pos.x;
 		double rx = px / static_cast<double>(pos.w);
@@ -474,7 +475,7 @@ void CVolumeSlider::clickLeft(tribool down, bool previousState)
 
 void CVolumeSlider::clickRight(tribool down, bool previousState)
 {
-	if (down)
+	if(down)
 	{
 		double px = GH.current->motion.x - pos.x;
 		int index = px / static_cast<double>(pos.w) * animImage->size();
@@ -489,7 +490,7 @@ void CVolumeSlider::clickRight(tribool down, bool previousState)
 
 void CVolumeSlider::wheelScrolled(bool down, bool in)
 {
-	if (in)
+	if(in)
 	{
 		int volume = value + 3 * (down ? 1 : -1);
 		vstd::abetween(volume, 0, 100);
@@ -504,12 +505,12 @@ void CSlider::sliderClicked()
 		addUsedEvents(MOVE);
 }
 
-void CSlider::mouseMoved (const SDL_MouseMotionEvent & sEvent)
+void CSlider::mouseMoved(const SDL_MouseMotionEvent & sEvent)
 {
 	double v = 0;
 	if(horizontal)
 	{
-		if(	std::abs(sEvent.y-(pos.y+pos.h/2)) > pos.h/2+40  ||  std::abs(sEvent.x-(pos.x+pos.w/2)) > pos.w/2  )
+		if(std::abs(sEvent.y - (pos.y + pos.h / 2)) > pos.h / 2 + 40 || std::abs(sEvent.x - (pos.x + pos.w / 2)) > pos.w / 2)
 			return;
 		v = sEvent.x - pos.x - 24;
 		v *= positions;
@@ -517,14 +518,14 @@ void CSlider::mouseMoved (const SDL_MouseMotionEvent & sEvent)
 	}
 	else
 	{
-		if(std::abs(sEvent.x-(pos.x+pos.w/2)) > pos.w/2+40  ||  std::abs(sEvent.y-(pos.y+pos.h/2)) > pos.h/2  )
+		if(std::abs(sEvent.x - (pos.x + pos.w / 2)) > pos.w / 2 + 40 || std::abs(sEvent.y - (pos.y + pos.h / 2)) > pos.h / 2)
 			return;
 		v = sEvent.y - pos.y - 24;
 		v *= positions;
 		v /= (pos.h - 48);
 	}
 	v += 0.5;
-	if(v!=value)
+	if(v != value)
 	{
 		moveTo(v);
 	}
@@ -547,12 +548,12 @@ int CSlider::getValue()
 
 void CSlider::moveLeft()
 {
-	moveTo(value-1);
+	moveTo(value - 1);
 }
 
 void CSlider::moveRight()
 {
-	moveTo(value+1);
+	moveTo(value + 1);
 }
 
 void CSlider::moveBy(int amount)
@@ -567,24 +568,24 @@ void CSlider::updateSliderPos()
 		if(positions)
 		{
 			double part = static_cast<double>(value) / positions;
-			part*=(pos.w-48);
+			part *= (pos.w - 48);
 			int newPos = part + pos.x + 16 - slider->pos.x;
 			slider->moveBy(Point(newPos, 0));
 		}
 		else
-			slider->moveTo(Point(pos.x+16, pos.y));
+			slider->moveTo(Point(pos.x + 16, pos.y));
 	}
 	else
 	{
 		if(positions)
 		{
 			double part = static_cast<double>(value) / positions;
-			part*=(pos.h-48);
+			part *= (pos.h - 48);
 			int newPos = part + pos.y + 16 - slider->pos.y;
 			slider->moveBy(Point(0, newPos));
 		}
 		else
-			slider->moveTo(Point(pos.x, pos.y+16));
+			slider->moveTo(Point(pos.x, pos.y + 16));
 	}
 }
 
@@ -611,20 +612,20 @@ void CSlider::clickLeft(tribool down, bool previousState)
 		double rw = 0;
 		if(horizontal)
 		{
-			pw = GH.current->motion.x-pos.x-25;
+			pw = GH.current->motion.x - pos.x - 25;
 			rw = pw / static_cast<double>(pos.w - 48);
 		}
 		else
 		{
-			pw = GH.current->motion.y-pos.y-24;
-			rw = pw / (pos.h-48);
+			pw = GH.current->motion.y - pos.y - 24;
+			rw = pw / (pos.h - 48);
 		}
-		if(pw < -8  ||  pw > (horizontal ? pos.w : pos.h) - 40)
+		if(pw < -8 || pw > (horizontal ? pos.w : pos.h) - 40)
 			return;
 		// 		if (rw>1) return;
 		// 		if (rw<0) return;
 		slider->clickLeft(true, slider->mouseState(EIntObjMouseBtnType::LEFT));
-		moveTo(rw * positions  +  0.5);
+		moveTo(rw * positions + 0.5);
 		return;
 	}
 	if(active & MOVE)
@@ -633,16 +634,15 @@ void CSlider::clickLeft(tribool down, bool previousState)
 
 CSlider::~CSlider()
 {
-
 }
 
-CSlider::CSlider(Point position, int totalw, std::function<void(int)> Moved, int Capacity, int Amount, int Value, bool Horizontal, CSlider::EStyle style):
-    capacity(Capacity),
-    horizontal(Horizontal),
-    amount(Amount),
-    value(Value),
-    scrollStep(1),
-    moved(Moved)
+CSlider::CSlider(Point position, int totalw, std::function<void(int)> Moved, int Capacity, int Amount, int Value, bool Horizontal, EStyle style):
+	capacity(Capacity),
+	horizontal(Horizontal),
+	amount(Amount),
+	value(Value),
+	scrollStep(1),
+	moved(Moved)
 {
 	OBJ_CONSTRUCTION_CAPTURING_ALL;
 	setAmount(amount);
@@ -657,11 +657,11 @@ CSlider::CSlider(Point position, int totalw, std::function<void(int)> Moved, int
 
 	if(style == BROWN)
 	{
-		std::string name = horizontal?"IGPCRDIV.DEF":"OVBUTN2.DEF";
+		std::string name = horizontal ? "IGPCRDIV.DEF" : "OVBUTN2.DEF";
 		//NOTE: this images do not have "blocked" frames. They should be implemented somehow (e.g. palette transform or something...)
 
-		left =   new CButton(Point(), name, CButton::tooltip());
-		right =  new CButton(Point(), name, CButton::tooltip());
+		left = new CButton(Point(), name, CButton::tooltip());
+		right = new CButton(Point(), name, CButton::tooltip());
 		slider = new CButton(Point(), name, CButton::tooltip());
 
 		left->setImageOrder(0, 1, 1, 1);
@@ -679,14 +679,14 @@ CSlider::CSlider(Point position, int totalw, std::function<void(int)> Moved, int
 	left->soundDisabled = true;
 	right->soundDisabled = true;
 
-	if (horizontal)
+	if(horizontal)
 		right->moveBy(Point(totalw - right->pos.w, 0));
 	else
 		right->moveBy(Point(0, totalw - right->pos.h));
 
-	left->addCallback(std::bind(&CSlider::moveLeft,this));
-	right->addCallback(std::bind(&CSlider::moveRight,this));
-	slider->addCallback(std::bind(&CSlider::sliderClicked,this));
+	left->addCallback(std::bind(&CSlider::moveLeft, this));
+	right->addCallback(std::bind(&CSlider::moveRight, this));
+	slider->addCallback(std::bind(&CSlider::sliderClicked, this));
 
 	if(horizontal)
 	{
@@ -702,14 +702,14 @@ CSlider::CSlider(Point position, int totalw, std::function<void(int)> Moved, int
 	updateSliderPos();
 }
 
-void CSlider::block( bool on )
+void CSlider::block(bool on)
 {
 	left->block(on);
 	right->block(on);
 	slider->block(on);
 }
 
-void CSlider::setAmount( int to )
+void CSlider::setAmount(int to)
 {
 	amount = to;
 	positions = to - capacity;
@@ -735,19 +735,19 @@ void CSlider::keyPressed(const SDL_KeyboardEvent & key)
 	switch(key.keysym.sym)
 	{
 	case SDLK_UP:
-		if (!horizontal)
+		if(!horizontal)
 			moveDest = value - scrollStep;
 		break;
 	case SDLK_LEFT:
-		if (horizontal)
+		if(horizontal)
 			moveDest = value - scrollStep;
 		break;
 	case SDLK_DOWN:
-		if (!horizontal)
+		if(!horizontal)
 			moveDest = value + scrollStep;
 		break;
 	case SDLK_RIGHT:
-		if (horizontal)
+		if(horizontal)
 			moveDest = value + scrollStep;
 		break;
 	case SDLK_PAGEUP:

@@ -25,34 +25,39 @@ struct Point
 	{
 		x = y = 0;
 	};
+
 	Point(int X, int Y)
-		:x(X),y(Y)
-	{};
-	Point(const int3 &a)
-		:x(a.x),y(a.y)
-	{}
-	Point(const SDL_MouseMotionEvent &a);
+		: x(X), y(Y)
+	{
+	};
+
+	Point(const int3 & a)
+		: x(a.x), y(a.y)
+	{
+	}
+
+	Point(const SDL_MouseMotionEvent & a);
 
 	template<typename T>
-	Point operator+(const T &b) const
+	Point operator+(const T & b) const
 	{
-		return Point(x+b.x,y+b.y);
+		return Point(x + b.x, y + b.y);
 	}
 
 	template<typename T>
-	Point operator/(const T &div) const
+	Point operator/(const T & div) const
 	{
-		return Point(x/div, y/div);
+		return Point(x / div, y / div);
 	}
 
 	template<typename T>
-	Point operator*(const T &mul) const
+	Point operator*(const T & mul) const
 	{
-		return Point(x*mul, y*mul);
+		return Point(x * mul, y * mul);
 	}
 
 	template<typename T>
-	Point& operator+=(const T &b)
+	Point & operator+=(const T & b)
 	{
 		x += b.x;
 		y += b.y;
@@ -60,33 +65,40 @@ struct Point
 	}
 
 	template<typename T>
-	Point operator-(const T &b) const
+	Point operator-(const T & b) const
 	{
 		return Point(x - b.x, y - b.y);
 	}
 
 	template<typename T>
-	Point& operator-=(const T &b)
+	Point & operator-=(const T & b)
 	{
 		x -= b.x;
 		y -= b.y;
 		return *this;
 	}
-	bool operator<(const Point &b) const //product order
+
+	bool operator<(const Point & b) const //product order
 	{
-		return x < b.x   &&   y < b.y;
+		return x < b.x && y < b.y;
 	}
-	template<typename T> Point& operator=(const T &t)
+
+	template<typename T>
+	Point & operator=(const T & t)
 	{
 		x = t.x;
 		y = t.y;
 		return *this;
 	}
-	template<typename T> bool operator==(const T &t) const
+
+	template<typename T>
+	bool operator==(const T & t) const
 	{
-		return x == t.x  &&  y == t.y;
+		return x == t.x && y == t.y;
 	}
-	template<typename T> bool operator!=(const T &t) const
+
+	template<typename T>
+	bool operator!=(const T & t) const
 	{
 		return !(*this == t);
 	}
@@ -99,6 +111,7 @@ struct Rect : public SDL_Rect
 	{
 		x = y = w = h = -1;
 	}
+
 	Rect(int X, int Y, int W, int H) //c-tor
 	{
 		x = X;
@@ -106,6 +119,7 @@ struct Rect : public SDL_Rect
 		w = W;
 		h = H;
 	}
+
 	Rect(const Point & position, const Point & size) //c-tor
 	{
 		x = position.x;
@@ -113,6 +127,7 @@ struct Rect : public SDL_Rect
 		w = size.x;
 		h = size.y;
 	}
+
 	Rect(const SDL_Rect & r) //c-tor
 	{
 		x = r.x;
@@ -120,58 +135,68 @@ struct Rect : public SDL_Rect
 		w = r.w;
 		h = r.h;
 	}
-	explicit Rect(const SDL_Surface * const &surf)
+
+	explicit Rect(const SDL_Surface * const & surf)
 	{
 		x = y = 0;
 		w = surf->w;
 		h = surf->h;
 	}
 
-	Rect centerIn(const Rect &r);
+	Rect centerIn(const Rect & r);
 	static Rect createCentered(int w, int h);
-	static Rect around(const Rect &r, int width = 1); //creates rect around another
+	static Rect around(const Rect & r, int width = 1); //creates rect around another
 
 	bool isIn(int qx, int qy) const //determines if given point lies inside rect
 	{
-		if (qx > x   &&   qx<x+w   &&   qy>y   &&   qy<y+h)
+		if(qx > x && qx < x + w && qy > y && qy < y + h)
 			return true;
 		return false;
 	}
+
 	bool isIn(const Point & q) const //determines if given point lies inside rect
 	{
-		return isIn(q.x,q.y);
+		return isIn(q.x, q.y);
 	}
+
 	Point topLeft() const //top left corner of this rect
 	{
-		return Point(x,y);
+		return Point(x, y);
 	}
+
 	Point topRight() const //top right corner of this rect
 	{
-		return Point(x+w,y);
+		return Point(x + w, y);
 	}
+
 	Point bottomLeft() const //bottom left corner of this rect
 	{
-		return Point(x,y+h);
+		return Point(x, y + h);
 	}
+
 	Point bottomRight() const //bottom right corner of this rect
 	{
-		return Point(x+w,y+h);
+		return Point(x + w, y + h);
 	}
-	Rect operator+(const Rect &p) const //moves this rect by p's rect position
+
+	Rect operator+(const Rect & p) const //moves this rect by p's rect position
 	{
-		return Rect(x+p.x,y+p.y,w,h);
+		return Rect(x + p.x, y + p.y, w, h);
 	}
-	Rect operator+(const Point &p) const //moves this rect by p's point position
+
+	Rect operator+(const Point & p) const //moves this rect by p's point position
 	{
-		return Rect(x+p.x,y+p.y,w,h);
+		return Rect(x + p.x, y + p.y, w, h);
 	}
-	Rect& operator=(const Point &p) //assignment operator
+
+	Rect & operator=(const Point & p) //assignment operator
 	{
 		x = p.x;
 		y = p.y;
 		return *this;
 	}
-	Rect& operator=(const Rect &p) //assignment operator
+
+	Rect & operator=(const Rect & p) //assignment operator
 	{
 		x = p.x;
 		y = p.y;
@@ -179,35 +204,42 @@ struct Rect : public SDL_Rect
 		h = p.h;
 		return *this;
 	}
-	Rect& operator+=(const Rect &p) //works as operator+
+
+	Rect & operator+=(const Rect & p) //works as operator+
 	{
 		x += p.x;
 		y += p.y;
 		return *this;
 	}
-	Rect& operator+=(const Point &p) //works as operator+
+
+	Rect & operator+=(const Point & p) //works as operator+
 	{
 		x += p.x;
 		y += p.y;
 		return *this;
 	}
-	Rect& operator-=(const Rect &p) //works as operator+
+
+	Rect & operator-=(const Rect & p) //works as operator+
 	{
 		x -= p.x;
 		y -= p.y;
 		return *this;
 	}
-	Rect& operator-=(const Point &p) //works as operator+
+
+	Rect & operator-=(const Point & p) //works as operator+
 	{
 		x -= p.x;
 		y -= p.y;
 		return *this;
 	}
-	template<typename T> Rect operator-(const T &t)
+
+	template<typename T>
+	Rect operator-(const T & t)
 	{
 		return Rect(x - t.x, y - t.y, w, h);
 	}
-	Rect operator&(const Rect &p) const //rect intersection
+
+	Rect operator&(const Rect & p) const //rect intersection
 	{
 		bool intersect = true;
 
@@ -215,11 +247,11 @@ struct Rect : public SDL_Rect
 		{
 			intersect = false;
 		}
-		else if(p.topLeft().y > y+h && p.bottomLeft().y > y+h) //rect p is below *this
+		else if(p.topLeft().y > y + h && p.bottomLeft().y > y + h) //rect p is below *this
 		{
 			intersect = false;
 		}
-		else if(p.topLeft().x > x+w && p.topRight().x > x+w) //rect p is on the right hand side of this
+		else if(p.topLeft().x > x + w && p.topRight().x > x + w) //rect p is on the right hand side of this
 		{
 			intersect = false;
 		}
@@ -234,26 +266,24 @@ struct Rect : public SDL_Rect
 			ret.x = std::max(this->x, p.x);
 			ret.y = std::max(this->y, p.y);
 			Point bR; //bottomRight point of returned rect
-			bR.x = std::min(this->w+this->x, p.w+p.x);
-			bR.y = std::min(this->h+this->y, p.h+p.y);
+			bR.x = std::min(this->w + this->x, p.w + p.x);
+			bR.y = std::min(this->h + this->y, p.h + p.y);
 			ret.w = bR.x - ret.x;
 			ret.h = bR.y - ret.y;
 			return ret;
 		}
-		else
-		{
-			return Rect();
-		}
+		return Rect();
 	}
-	Rect operator|(const Rect &p) const //union of two rects
+
+	Rect operator|(const Rect & p) const //union of two rects
 	{
 		Rect ret;
-		ret.x =  std::min(p.x, this->x);
-		ret.y =  std::min(p.y, this->y);
-		int x2 = std::max(p.x+p.w, this->x+this->w);
-		int y2 = std::max(p.y+p.h, this->y+this->h);
-		ret.w = x2 -ret.x;
-		ret.h = y2 -ret.y;
+		ret.x = std::min(p.x, this->x);
+		ret.y = std::min(p.y, this->y);
+		int x2 = std::max(p.x + p.w, this->x + this->w);
+		int y2 = std::max(p.y + p.h, this->y + this->h);
+		ret.w = x2 - ret.x;
+		ret.h = y2 - ret.y;
 		return ret;
 	}
 };

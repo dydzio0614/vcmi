@@ -36,7 +36,7 @@ class CSpellWindow : public CWindowObject
 		CSpellWindow * owner;
 		CAnimImage * image;
 		IImage * schoolBorder;
-		CLabel * name, * level, * cost;
+		CLabel *name, *level, *cost;
 	public:
 		SpellArea(SDL_Rect pos, CSpellWindow * owner);
 		~SpellArea();
@@ -63,13 +63,13 @@ class CSpellWindow : public CWindowObject
 		InteractiveArea(const SDL_Rect & myRect, std::function<void()> funcL, int helpTextId, CSpellWindow * _owner);//c-tor
 	};
 
-	CPicture * leftCorner, * rightCorner;
+	CPicture *leftCorner, *rightCorner;
 
 	std::shared_ptr<CAnimation> spells; //pictures of spells
 
 	CAnimImage * spellTab; //school select
 	CAnimImage * schools; //schools' pictures
-	std::array< std::shared_ptr<CAnimation>, 4> schoolBorders; //schools' 'borders': [0]: air, [1]: fire, [2]: water, [3]: earth
+	std::array<std::shared_ptr<CAnimation>, 4> schoolBorders; //schools' 'borders': [0]: air, [1]: fire, [2]: water, [3]: earth
 
 	SpellArea * spellAreas[12];
 	CLabel * mana;

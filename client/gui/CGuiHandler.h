@@ -11,7 +11,8 @@ class IUpdateable;
 class IShowActivatable;
 class IShowable;
 enum class EIntObjMouseBtnType;
-template <typename T> struct CondSh;
+template<typename T>
+struct CondSh;
 
 /*
  * CGuiHandler.h, part of VCMI engine
@@ -30,14 +31,14 @@ private:
 	double rateticks;
 	ui32 lastticks, timeElapsed;
 	int rate;
-	ui32 accumulatedTime,accumulatedFrames;
+	ui32 accumulatedTime, accumulatedFrames;
 public:
 	int fps; // the actual fps value
 
 	CFramerateManager(int rate); // initializes the manager with a given fps rate
 	void init(); // needs to be called directly before the main game loop to reset the internal timer
 	void framerateDelay(); // needs to be called every game update cycle
-	ui32 getElapsedMilliseconds() const {return this->timeElapsed;}
+	ui32 getElapsedMilliseconds() const { return this->timeElapsed; }
 };
 
 // Handles GUI logic and drawing
@@ -53,11 +54,11 @@ private:
 
 	//active GUI elements (listening for events
 	CIntObjectList lclickable,
-				   rclickable,
-				   mclickable,
-				   hoverable,
-				   keyinterested,
-				   motioninterested,
+	               rclickable,
+	               mclickable,
+	               hoverable,
+	               keyinterested,
+	               motioninterested,
 	               timeinterested,
 	               wheelInterested,
 	               doubleClickInterested,
@@ -75,7 +76,7 @@ public:
 	std::vector<IShowable*> objsToBlit;
 
 	SDL_Event * current; //current event - can be set to nullptr to stop handling event
-	IUpdateable *curInt;
+	IUpdateable * curInt;
 
 	Point lastClick;
 	unsigned lastClickTime;
@@ -92,17 +93,17 @@ public:
 	void totalRedraw(); //forces total redraw (using showAll), sets a flag, method gets called at the end of the rendering
 	void simpleRedraw(); //update only top interface and draw background from buffer, sets a flag, method gets called at the end of the rendering
 
-	void popInt(IShowActivatable *top); //removes given interface from the top and activates next
-	void popIntTotally(IShowActivatable *top); //deactivates, deletes, removes given interface from the top and activates next
-	void pushInt(IShowActivatable *newInt); //deactivate old top interface, activates this one and pushes to the top
+	void popInt(IShowActivatable * top); //removes given interface from the top and activates next
+	void popIntTotally(IShowActivatable * top); //deactivates, deletes, removes given interface from the top and activates next
+	void pushInt(IShowActivatable * newInt); //deactivate old top interface, activates this one and pushes to the top
 	void popInts(int howMany); //pops one or more interfaces - deactivates top, deletes and removes given number of interfaces, activates new front
-	IShowActivatable *topInt(); //returns top interface
+	IShowActivatable * topInt(); //returns top interface
 
 	void updateTime(); //handles timeInterested
 	void handleEvents(); //takes events from queue and calls interested objects
-	void handleEvent(SDL_Event *sEvent);
-	void handleMouseMotion(SDL_Event *sEvent);
-	void handleMoveInterested( const SDL_MouseMotionEvent & motion );
+	void handleEvent(SDL_Event * sEvent);
+	void handleMouseMotion(SDL_Event * sEvent);
+	void handleMoveInterested(const SDL_MouseMotionEvent & motion);
 	void fakeMouseMove();
 	void breakEventHandling(); //current event won't be propagated anymore
 	void drawFPSCounter(); // draws the FPS to the upper left corner of the screen
@@ -119,15 +120,16 @@ public:
 
 extern CGuiHandler GH; //global gui handler
 
-template <typename T> void pushIntT()
+template<typename T>
+void pushIntT()
 {
 	GH.pushInt(new T());
 }
 
 struct SObjectConstruction
 {
-	CIntObject *myObj;
-	SObjectConstruction(CIntObject *obj);
+	CIntObject * myObj;
+	SObjectConstruction(CIntObject * obj);
 	~SObjectConstruction();
 };
 

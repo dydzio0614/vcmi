@@ -29,7 +29,8 @@ protected:
 
 public:
 	virtual ~IFont()
-	{}
+	{
+	}
 
 	/// Returns height of font
 	virtual size_t getLineHeight() const = 0;
@@ -68,7 +69,7 @@ class CBitmapFont : public IFont
 		si32 leftOffset;
 		ui32 width;
 		si32 rightOffset;
-		ui8 *pixels; // pixels of this character, part of BitmapFont::data
+		ui8 * pixels; // pixels of this character, part of BitmapFont::data
 	};
 
 	const std::pair<std::unique_ptr<ui8[]>, ui64> data;
@@ -78,7 +79,7 @@ class CBitmapFont : public IFont
 
 	std::array<BitmapChar, totalChars> loadChars() const;
 
-	void renderCharacter(SDL_Surface * surface, const BitmapChar & character, const SDL_Color & color, int &posX, int &posY) const;
+	void renderCharacter(SDL_Surface * surface, const BitmapChar & character, const SDL_Color & color, int & posX, int & posY) const;
 
 	void renderText(SDL_Surface * surface, const std::string & data, const SDL_Color & color, const Point & pos) const override;
 public:
@@ -103,7 +104,7 @@ class CBitmapHanFont : public IFont
 	size_t getCharacterDataOffset(size_t index) const;
 	size_t getCharacterIndex(ui8 first, ui8 second) const;
 
-	void renderCharacter(SDL_Surface * surface, int characterIndex, const SDL_Color & color, int &posX, int &posY) const;
+	void renderCharacter(SDL_Surface * surface, int characterIndex, const SDL_Color & color, int & posX, int & posY) const;
 	void renderText(SDL_Surface * surface, const std::string & data, const SDL_Color & color, const Point & pos) const override;
 public:
 	CBitmapHanFont(const JsonNode & config);
@@ -116,7 +117,7 @@ class CTrueTypeFont : public IFont
 {
 	const std::pair<std::unique_ptr<ui8[]>, ui64> data;
 
-	const std::unique_ptr<TTF_Font, void (*)(TTF_Font*)> font;
+	const std::unique_ptr<TTF_Font, void (*)(TTF_Font *)> font;
 	const bool blended;
 
 	std::pair<std::unique_ptr<ui8[]>, ui64> loadData(const JsonNode & config);

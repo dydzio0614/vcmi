@@ -18,7 +18,7 @@ class CWindowObject : public CIntObject
 	CPicture * createBg(std::string imageName, bool playerColored);
 	int getUsedEvents(int options);
 
-	CIntObject *shadow;
+	CIntObject * shadow;
 	void setShadow(bool on);
 
 	int options;
@@ -31,7 +31,7 @@ protected:
 	//Used only if RCLICK_POPUP was set
 	void clickRight(tribool down, bool previousState) override;
 	//To display border
-	void showAll(SDL_Surface *to) override;
+	void showAll(SDL_Surface * to) override;
 	//change or set background image
 	void setBackground(std::string filename);
 	void updateShadow();
