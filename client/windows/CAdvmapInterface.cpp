@@ -1012,7 +1012,7 @@ void CAdvMapInt::show(SDL_Surface * to)
 		return;
 
 	++animValHitCount; //for animations
-	if(animValHitCount == 8)
+	if(animValHitCount == 4)
 	{
 		CGI->mh->updateWater();
 		animValHitCount = 0;

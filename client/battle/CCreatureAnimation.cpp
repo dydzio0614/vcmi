@@ -59,7 +59,7 @@ float AnimationControls::getCreatureAnimationSpeed(const CCreature * creature, c
 	switch (type)
 	{
 	case CCreatureAnim::MOVING:
-		return speed * 2 * creature->animation.walkAnimationTime / anim->framesInGroup(type);
+		return (speed / 0.63) * 2.0 * creature->animation.walkAnimationTime / anim->framesInGroup(type);
 
 	case CCreatureAnim::MOUSEON:
 		return baseSpeed;
@@ -89,7 +89,7 @@ float AnimationControls::getCreatureAnimationSpeed(const CCreature * creature, c
 	case CCreatureAnim::VCMI_2HEX_DOWN:
 	case CCreatureAnim::VCMI_2HEX_FRONT:
 	case CCreatureAnim::VCMI_2HEX_UP:
-		return speed * 3 / anim->framesInGroup(type);
+		return speed * 4.5 / anim->framesInGroup(type);
 
 	case CCreatureAnim::TURN_L:
 	case CCreatureAnim::TURN_R:
@@ -115,7 +115,7 @@ float AnimationControls::getProjectileSpeed()
 
 float AnimationControls::getSpellEffectSpeed()
 {
-	return settings["battle"]["animationSpeed"].Float() * 60;
+	return settings["battle"]["animationSpeed"].Float() * 20;
 }
 
 float AnimationControls::getMovementDuration(const CCreature * creature)
