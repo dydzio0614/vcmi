@@ -193,6 +193,7 @@ public:
 	void tryRealize(Goals::CollectRes & g);
 	void tryRealize(Goals::Build & g);
 	void tryRealize(Goals::BuyArmy & g);
+	void tryRealize(Goals::DefendTowns & g);
 	void tryRealize(Goals::Invalid & g);
 	void tryRealize(Goals::AbstractGoal & g);
 

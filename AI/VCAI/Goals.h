@@ -56,7 +56,8 @@ enum EGoals
 	VISIT_TILE, //tile, in conjunction with hero elementar; assumes tile is reachable
 	CLEAR_WAY_TO,
 	DIG_AT_TILE,//elementar with hero on tile
-	BUY_ARMY //at specific town
+	BUY_ARMY, //at specific town
+	DEFEND_TOWNS //if possible, we want to defend all towns from incoming danger
 };
 
 	//method chaining + clone pattern
@@ -556,6 +557,17 @@ public:
 		return g.goalType == goalType && g.tile == tile;
 	}
 	std::string completeMessage() const override;
+};
+
+class DLL_EXPORT DefendTowns : public CGoal<DefendTowns>
+{
+public:
+	DefendTowns() : CGoal(Goals::DEFEND_TOWNS)
+	{
+		priority = 5;
+	}
+
+	TSubgoal whatToDoToAchieve() override;
 };
 
 class DLL_EXPORT ClearWayTo : public CGoal<ClearWayTo>

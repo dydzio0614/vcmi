@@ -31,6 +31,8 @@ class CGVisitableOPW;
 
 const double SAFE_ATTACK_CONSTANT = 1.5;
 
+const int TOWN_THREAT_DETECTION_RADIUS = 15;
+
 //one thread may be turn of AI and another will be handling a side effect for AI2
 boost::thread_specific_ptr<CCallback> cb;
 boost::thread_specific_ptr<VCAI> ai;
@@ -2272,6 +2274,30 @@ void VCAI::tryRealize(Goals::BuyArmy & g)
 			throw cannotFulfillGoalException("Can't buy any more creatures!");
 	}
 	throw goalFulfilledException(sptr(g)); //we bought as many creatures as we wanted
+}
+
+void VCAI::tryRealize(Goals::DefendTowns & g)
+{
+	for(const CGTownInstance * t : cb->getTownsInfo())
+	{
+		std::unordered_set<int3, ShashInt3> nearbyTiles;
+		myCb->getVisibleTilesInRange(nearbyTiles, t->pos, TOWN_THREAT_DETECTION_RADIUS);
+		std::vector<const CGHeroInstance*> nearbyAllies;
+		std::vector<const CGHeroInstance*> nearbyEnemies;
+		for(auto t : nearbyTiles)
+		{
+			auto hero = myCb->getHero(myCb->getTopObj(t)->id);
+			if(hero != nullptr)
+			{
+				auto heroRelations = myCb->getPlayerRelations(myCb->getMyColor().get(), hero->getOwner());
+				if(heroRelations == PlayerRelations::ENEMIES)
+					nearbyEnemies.push_back(hero);
+				else if(heroRelations == PlayerRelations::SAME_PLAYER)
+					nearbyAllies.push_back(hero);
+			}
+		}
+		//TODO: actual defense logic
+	}
 }
 
 void VCAI::tryRealize(Goals::Invalid & g)

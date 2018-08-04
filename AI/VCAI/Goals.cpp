@@ -222,6 +222,10 @@ namespace Goals
 	{
 		return boost::format("Bought army of value %d in town of %s") % value, town->name;
 	}
+	TSubgoal DefendTowns::whatToDoToAchieve()
+	{
+		return iAmElementar();
+	}
 }
 
 //TSubgoal AbstractGoal::whatToDoToAchieve()
