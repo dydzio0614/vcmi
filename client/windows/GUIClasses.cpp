@@ -1746,8 +1746,8 @@ void CObjectListWindow::CItem::clickLeft(tribool down, bool previousState)
 		parent->changeSelection(index);
 }
 
-CObjectListWindow::CObjectListWindow(const std::vector<int> & _items, std::shared_ptr<CIntObject> titleWidget_, std::string _title, std::string _descr, std::function<void(int)> Callback)
-	: CWindowObject(PLAYER_COLORED, "TPGATE"),
+CObjectListWindow::CObjectListWindow(const std::vector<int> & _items, std::shared_ptr<CIntObject> titleWidget_, std::string _title, std::string _descr, std::function<void(int)> Callback, bool playerColored)
+	: CWindowObject(playerColored ? PLAYER_COLORED : 0, "TPGATE"),
 	onSelect(Callback),
 	selected(0)
 {
@@ -1761,8 +1761,8 @@ CObjectListWindow::CObjectListWindow(const std::vector<int> & _items, std::share
 	init(titleWidget_, _title, _descr);
 }
 
-CObjectListWindow::CObjectListWindow(const std::vector<std::string> & _items, std::shared_ptr<CIntObject> titleWidget_, std::string _title, std::string _descr, std::function<void(int)> Callback)
-	: CWindowObject(PLAYER_COLORED, "TPGATE"),
+CObjectListWindow::CObjectListWindow(const std::vector<std::string> & _items, std::shared_ptr<CIntObject> titleWidget_, std::string _title, std::string _descr, std::function<void(int)> Callback, bool playerColored)
+	: CWindowObject(playerColored ? PLAYER_COLORED : 0, "TPGATE"),
 	onSelect(Callback),
 	selected(0)
 {

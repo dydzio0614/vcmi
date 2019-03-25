@@ -44,6 +44,7 @@ private:
 	std::shared_ptr<CLabel> labelMapSize;
 	std::shared_ptr<CToggleGroup> groupMapSize;
 	std::shared_ptr<CToggleButton> buttonTwoLevels;
+	std::shared_ptr<CButton> rmgTemplateButton;
 
 	std::shared_ptr<CLabelGroup> labelGroupForOptions;
 	std::shared_ptr<CToggleGroup> groupMaxPlayers;

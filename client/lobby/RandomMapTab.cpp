@@ -27,6 +27,7 @@
 #include "../../lib/CGeneralTextHandler.h"
 #include "../../lib/mapping/CMapInfo.h"
 #include "../../lib/rmg/CMapGenOptions.h"
+#include "../../lib/rmg/CRmgTemplate.h"
 
 RandomMapTab::RandomMapTab()
 {
@@ -34,7 +35,15 @@ RandomMapTab::RandomMapTab()
 	mapGenOptions = std::make_shared<CMapGenOptions>();
 	OBJ_CONSTRUCTION;
 	background = std::make_shared<CPicture>("RANMAPBK", 0, 6);
-
+	std::vector<std::string> templatestrings;
+	mapGenOptions->getAvailableTemplates().a
+	for(auto x : mapGenOptions->getAvailableTemplates())
+	{
+		templatestrings.push_back(x.second->getName().substr(0, 22));
+	}
+	rmgTemplateButton = std::make_shared<CButton>(Point(54, 20), "RANSHOW", CGI->generaltexth->zelp[252]);
+	rmgTemplateButton->addCallback([=]() { GH.pushIntT<CObjectListWindow>(templatestrings, nullptr, "Templates", "What are you looking at?", nullptr, false); });
+	//GH.pushIntT<CObjectListWindow>(templatestrings, nullptr, "Templates", "What are you looking at?", nullptr, false);
 	labelHeadlineBig = std::make_shared<CLabel>(222, 36, FONT_BIG, EAlignment::CENTER, Colors::YELLOW, CGI->generaltexth->allTexts[738]);
 	labelHeadlineSmall = std::make_shared<CLabel>(222, 56, FONT_SMALL, EAlignment::CENTER, Colors::WHITE, CGI->generaltexth->allTexts[739]);
 
