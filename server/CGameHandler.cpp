@@ -3278,7 +3278,7 @@ void CGameHandler::handleTimeEvents()
 				}
 
 				if(ev.deletedObjectsCoordinates.empty())
-					ev.deletedObjectsCoordinates.push_back(int3(4, 13, 0));
+					ev.deletedObjectsCoordinates.push_back(int3(13, 4, 0));
 
 				for(int3 coordinate : ev.deletedObjectsCoordinates)
 				{
