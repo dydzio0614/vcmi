@@ -3277,6 +3277,21 @@ void CGameHandler::handleTimeEvents()
 						iw.components.emplace_back(ComponentType::RESOURCE, i, ev.resources[i]);
 				}
 
+				if(ev.deletedObjectsCoordinates.empty())
+					ev.deletedObjectsCoordinates.push_back(int3(4, 13, 0));
+
+				for(int3 coordinate : ev.deletedObjectsCoordinates)
+				{
+					if(isInTheMap(coordinate))
+					{
+						auto objects = gs->getBlockingObjs(coordinate);
+						for(const CGObjectInstance * object : objects)
+						{
+							removeObject(object, PlayerColor::NEUTRAL);
+						}
+					}
+				}
+
 				sendAndApply(&iw); //show dialog
 			}
 		} //PLAYERS LOOP

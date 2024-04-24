@@ -72,6 +72,7 @@ void CMapEvent::serializeJson(JsonSerializeFormat & handler)
 	handler.serializeInt("firstOccurence", firstOccurence);
 	handler.serializeInt("nextOccurence", nextOccurence);
 	resources.serializeJson(handler, "resources");
+	//handler.serializeRaw("deletedObjects", deletedObjectsCoordinates, std::nullopt); //TODO
 }
 
 void CCastleEvent::serializeJson(JsonSerializeFormat & handler)

@@ -516,6 +516,7 @@ set(lib_MAIN_HEADERS
 	networkPacks/ArtifactLocation.h
 	networkPacks/BattleChanges.h
 	networkPacks/Component.h
+	networkPacks/DeleteObject.h
 	networkPacks/EInfoWindowMode.h
 	networkPacks/EntityChanges.h
 	networkPacks/EOpenWindowMode.h

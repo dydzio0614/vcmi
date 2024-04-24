@@ -39,6 +39,7 @@ enum class ESerializationVersion : int32_t
 	JSON_FLAGS, // 836 json uses new format for flags
 	MANA_LIMIT,	// 837 change MANA_PER_KNOWLEGDE to percentage
 	BONUS_META_STRING,	// 838 bonuses use MetaString instead of std::string for descriptions
+	EVENT_OBJECTS_DELETION,
 
-	CURRENT = BONUS_META_STRING
+	CURRENT = EVENT_OBJECTS_DELETION
 };

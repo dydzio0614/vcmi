@@ -12,6 +12,7 @@
 
 #include "../ResourceSet.h"
 #include "../MetaString.h"
+#include "../int3.h"
 
 VCMI_LIB_NAMESPACE_BEGIN
 
@@ -41,6 +42,9 @@ public:
 	bool computerAffected;
 	ui32 firstOccurence;
 	ui32 nextOccurence; /// specifies after how many days the event will occur the next time; 0 if event occurs only one time
+	std::vector<int3> deletedObjectsCoordinates;
+
+	std::vector<int3> unused;
 
 	template <typename Handler>
 	void serialize(Handler & h)
@@ -53,6 +57,10 @@ public:
 		h & computerAffected;
 		h & firstOccurence;
 		h & nextOccurence;
+		if(h.version >= Handler::Version::EVENT_OBJECTS_DELETION)
+			h & deletedObjectsCoordinates;
+		else
+			h & unused;
 	}
 	
 	virtual void serializeJson(JsonSerializeFormat & handler);
