@@ -16,11 +16,21 @@
 #include "../../lib/constants/NumericConstants.h"
 #include "../../lib/constants/StringConstants.h"
 
-QVariant toVariant(const TResources & resources)
+QVariant resourcesToVariant(const TResources & resources)
 {
 	QVariantMap result;
 	for(int i = 0; i < GameConstants::RESOURCE_QUANTITY; ++i)
 		result[QString::fromStdString(GameConstants::RESOURCE_NAMES[i])] = QVariant::fromValue(resources[i]);
+	return result;
+}
+
+QVariant deletedObjectsPositionsToVariant(std::vector<int3> positions)
+{
+	QVariantList result;
+	for(int3 position : positions)
+	{
+		result.push_back(QVariant::fromValue<int3>(position));
+	}
 	return result;
 }
 
@@ -33,6 +43,18 @@ TResources resourcesFromVariant(const QVariant & v)
 
 }
 
+std::vector<int3> deletedObjectsPositionsFromVariant(const QVariant & v)
+{
+	std::vector<int3> result;
+	for (auto positionAsVariant : v.toList())
+	{
+		int3 position = positionAsVariant.value<int3>();
+		result.push_back(position);
+	}
+
+	return result;
+}
+
 QVariant toVariant(const CMapEvent & event)
 {
 	QVariantMap result;
@@ -43,7 +65,8 @@ QVariant toVariant(const CMapEvent & event)
 	result["computerAffected"] = QVariant::fromValue(event.computerAffected);
 	result["firstOccurence"] = QVariant::fromValue(event.firstOccurence);
 	result["nextOccurence"] = QVariant::fromValue(event.nextOccurence);
-	result["resources"] = toVariant(event.resources);
+	result["resources"] = resourcesToVariant(event.resources);
+	result["deletedObjectsPositions"] = deletedObjectsPositionsToVariant(event.deletedObjectsCoordinates);
 	return QVariant(result);
 }
 
@@ -59,6 +82,7 @@ CMapEvent eventFromVariant(CMapHeader & mapHeader, const QVariant & variant)
 	result.firstOccurence = v.value("firstOccurence").toInt();
 	result.nextOccurence = v.value("nextOccurence").toInt();
 	result.resources = resourcesFromVariant(v.value("resources"));
+	result.deletedObjectsCoordinates = deletedObjectsPositionsFromVariant(v.value("deletedObjectsPositions"));
 	return result;
 }
 
