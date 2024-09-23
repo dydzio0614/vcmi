@@ -217,6 +217,25 @@ bool CCallback::buildBuilding(const CGTownInstance *town, BuildingID buildingID)
 	return true;
 }
 
+bool CCallback::destroyMageGuild(const CGTownInstance *town)
+{
+	if(town->tempOwner != player)
+		return false;
+
+	if(!town->hasBuilt(BuildingID::MAGES_GUILD_5))
+		return false;
+
+	for(int i = 0; i < 5; i++)
+	{
+		RazeStructure pack;
+		pack.tid = town->id;
+		pack.bid = BuildingID::MAGES_GUILD_5 - i;
+		sendRequest(&pack);
+	}
+
+	return true;
+}
+
 bool CCallback::visitTownBuilding(const CGTownInstance *town, BuildingID buildingID)
 {
 	if(town->tempOwner!=player)

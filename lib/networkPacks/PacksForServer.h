@@ -303,6 +303,7 @@ struct DLL_LINKAGE VisitTownBuilding : public CPackForServer
 
 struct DLL_LINKAGE RazeStructure : public BuildStructure
 {
+	RazeStructure() = default;
 	void visitTyped(ICPackVisitor & visitor) override;
 };
 

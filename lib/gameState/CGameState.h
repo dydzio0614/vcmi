@@ -78,6 +78,7 @@ public:
 
 	void init(const IMapService * mapService, StartInfo * si, Load::ProgressAccumulator &, bool allowSavingRandomMap = true);
 	void updateOnLoad(StartInfo * si);
+	void reinitSpells(CGTownInstance * town);
 
 	ConstTransitivePtr<StartInfo> scenarioOps;
 	ConstTransitivePtr<StartInfo> initialOpts; //copy of settings received from pregame (not randomized)

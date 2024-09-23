@@ -156,6 +156,13 @@ void CBuildingRect::showPopupWindow(const Point & cursorPosition)
 		return;
 
 	BuildingID bid = getBuilding()->bid;
+
+	if(bid == BuildingID::MAGES_GUILD_5)
+	{
+		LOCPLINT->cb->destroyMageGuild(this->town);
+		return;
+	}
+
 	const CBuilding *bld = town->town->buildings.at(bid);
 	if (bid < BuildingID::DWELL_FIRST)
 	{

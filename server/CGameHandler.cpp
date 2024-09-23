@@ -2230,6 +2230,11 @@ bool CGameHandler::razeStructure (ObjectInstanceID tid, BuildingID bid)
 // 		rb.id = 17;
 // 		sendAndApply(&rb);
 // 	}
+	if(vstd::find(rs.bid, BuildingID::MAGES_GUILD_5) != rs.bid.end())
+	{
+		gs->reinitSpells((CGTownInstance*)t);
+	}
+
 	return true;
 }
 

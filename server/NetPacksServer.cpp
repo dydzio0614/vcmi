@@ -138,6 +138,14 @@ void ApplyGhNetPackVisitor::visitBuildStructure(BuildStructure & pack)
 	result = gh.buildStructure(pack.tid, pack.bid);
 }
 
+void ApplyGhNetPackVisitor::visitRazeStructure(RazeStructure & pack)
+{
+	gh.throwIfWrongOwner(&pack, pack.tid);
+	gh.throwIfPlayerNotActive(&pack);
+
+	result = gh.razeStructure(pack.tid, pack.bid);
+}
+
 void ApplyGhNetPackVisitor::visitVisitTownBuilding(VisitTownBuilding & pack)
 {
 	gh.throwIfWrongOwner(&pack, pack.tid);

@@ -919,6 +919,52 @@ void CGameState::initTowns()
 	}
 }
 
+void CGameState::reinitSpells(CGTownInstance * town)
+{
+	//init spells
+	for(auto spellID : VLC->spellh->getDefaultAllowed()) //add all regular spells to town
+		town->possibleSpells.push_back(spellID);
+
+	town->spells.clear();
+	town->spells.resize(GameConstants::SPELL_LEVELS);
+	town->possibleSpells -= SpellID::PRESET;
+	for(ui32 z=0; z<town->obligatorySpells.size();z++)
+	{
+		const auto * s = town->obligatorySpells[z].toSpell();
+		town->spells[s->getLevel()-1].push_back(s->id);
+		town->possibleSpells -= s->id;
+	}
+	while(!town->possibleSpells.empty())
+	{
+		ui32 total=0;
+		int sel = -1;
+
+		for(ui32 ps=0;ps<town->possibleSpells.size();ps++)
+			total += town->possibleSpells[ps].toSpell()->getProbability(town->getFaction());
+
+		if (total == 0) // remaining spells have 0 probability
+			break;
+
+		auto r = getRandomGenerator().nextInt(total - 1);
+		for(ui32 ps=0; ps<town->possibleSpells.size();ps++)
+		{
+			r -= town->possibleSpells[ps].toSpell()->getProbability(town->getFaction());
+			if(r<0)
+			{
+				sel = ps;
+				break;
+			}
+		}
+		if(sel<0)
+			sel=0;
+
+		const auto * s = town->possibleSpells[sel].toSpell();
+		town->spells[s->getLevel()-1].push_back(s->id);
+		town->possibleSpells -= s->id;
+	}
+	town->possibleSpells.clear();
+}
+
 void CGameState::initMapObjects()
 {
 	logGlobal->debug("\tObject initialization");
