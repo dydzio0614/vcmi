@@ -47,7 +47,8 @@
 
 RandomMapTab::RandomMapTab():
 	InterfaceObjectConfigurable(),
-	templateIndex(0)
+	templateIndex(0),
+	lastSelectedMapSize(-1)
 {
 	recActions = 0;
 	mapGenOptions = std::make_shared<CMapGenOptions>();
@@ -219,7 +220,7 @@ void RandomMapTab::onToggleMapSize(int btnId)
 
 	if(btnId == mapSizeVal.size() - 1)
 	{
-		ENGINE->windows().createAndPushWindow<SetSizeWindow>(int3(mapGenOptions->getWidth(), mapGenOptions->getHeight(), mapGenOptions->getLevels()), mapGenOptions->getMapTemplate(), [this, setTemplateForSize](int3 ret){
+		auto okButtonCallback = [this, setTemplateForSize](int3 ret){
 			if(ret.z > 2)
 			{
 				std::shared_ptr<CInfoWindow> temp = CInfoWindow::create(LIBRARY->generaltexth->translate("vcmi.lobby.customRmgSize.experimental"), PlayerColor(0), {}); //TODO: multilevel support
@@ -228,8 +229,21 @@ void RandomMapTab::onToggleMapSize(int btnId)
 			mapGenOptions->setWidth(ret.x);
 			mapGenOptions->setHeight(ret.y);
 			mapGenOptions->setLevels(ret.z);
-			setTemplateForSize();
-		});
+			updateMapInfoByHost();
+		};
+
+		auto cancelButtonCallback = [this]
+		{
+			auto mapSizeToggleGroup = widget<CToggleGroup>("groupMapSize");
+
+			logGlobal->warn(std::to_string(lastSelectedMapSize));
+			if(lastSelectedMapSize == getStandardMapSizes().size() - 1)
+				widget<CToggleGroup>("groupMapSize")->setSelected(-1);
+			else
+				mapSizeToggleGroup->setSelected(lastSelectedMapSize);
+		};
+
+		ENGINE->windows().createAndPushWindow<SetSizeWindow>(int3(mapGenOptions->getWidth(), mapGenOptions->getHeight(), mapGenOptions->getLevels()), okButtonCallback, cancelButtonCallback);
 		return;
 	}
 
@@ -400,6 +414,7 @@ void RandomMapTab::setMapGenOptions(std::shared_ptr<CMapGenOptions> opts)
 			}
 		}
 		auto position = vstd::find_pos(getStandardMapSizes(), opts->getWidth());
+		lastSelectedMapSize = w->getSelected();
 		w->setSelected(position == mapSizes.size() - 1 || opts->getWidth() != opts->getHeight() ? -1 : position);
 	}
 	if(auto w = widget<CToggleButton>("buttonTwoLevels"))
@@ -468,6 +483,14 @@ void RandomMapTab::setMapGenOptions(std::shared_ptr<CMapGenOptions> opts)
 
 void RandomMapTab::setTemplate(const CRmgTemplate * tmpl)
 {
+	if(!tmpl->matchesSize(int3(mapGenOptions->getWidth(), mapGenOptions->getHeight(), mapGenOptions->getLevels())))
+	{
+		auto sizes = tmpl->getMapSizes();
+		mapGenOptions->setWidth(sizes.first.x);
+		mapGenOptions->setHeight(sizes.first.y);
+		mapGenOptions->setLevels(sizes.first.z);
+	}
+
 	mapGenOptions->setMapTemplate(tmpl);
 	setMapGenOptions(mapGenOptions);
 	if(auto w = widget<CButton>("templateButton"))
@@ -707,82 +730,42 @@ void RandomMapTab::loadOptions()
 	// TODO: Save & load difficulty?
 }
 
-SetSizeWindow::SetSizeWindow(int3 initSize, const CRmgTemplate * mapTemplate, std::function<void(int3)> cb)
+SetSizeWindow::SetSizeWindow(int3 initSize, std::function<void(int3)> cb, std::function<void()> cancelCb)
 	: CWindowObject(BORDERED)
 {
 	OBJECT_CONSTRUCTION;
 
 	pos.w = 300;
-	pos.h = 180;
+	pos.h = 200;
 
 	updateShadow();
 	center();
 
 	background = std::make_shared<FilledTexturePlayerColored>(Rect(0, 0, pos.w, pos.h));
 	background->setPlayerColor(PlayerColor(1));
-	buttonCancel = std::make_shared<CButton>(Point(160, 140), AnimationPath::builtin("MuBcanc"), CButton::tooltip(), [this, cb](){ close();}, EShortcut::GLOBAL_CANCEL);
-	buttonOk = std::make_shared<CButton>(Point(70, 140), AnimationPath::builtin("MuBchck"), CButton::tooltip(), [this, cb](){
+	buttonCancel = std::make_shared<CButton>(Point(160, 165), AnimationPath::builtin("MuBcanc"), CButton::tooltip(), [this, cancelCb]()
+	{
+		close();
+		if(cancelCb)
+			cancelCb();
+	}, EShortcut::GLOBAL_CANCEL);
+	buttonOk = std::make_shared<CButton>(Point(70, 165), AnimationPath::builtin("MuBchck"), CButton::tooltip(), [this, cb](){
 		close();
 		if(cb)
 			cb(int3(std::max(1, std::stoi(numInputs[0]->getText())), std::max(1, std::stoi(numInputs[1]->getText())), std::max(1, std::stoi(numInputs[2]->getText()))));
 	}, EShortcut::GLOBAL_ACCEPT);
 
-	int3 minSize = mapTemplate ? mapTemplate->getMapSizes().first : int3{36,36,1};
-	int3 maxSize = mapTemplate ? mapTemplate->getMapSizes().second : int3{999,999,9};
-
-	MetaString minSizeString;
-	MetaString maxSizeString;
-	minSizeString.appendTextID("vcmi.randomMapTab.template.minimalSize");
-	maxSizeString.appendTextID("vcmi.randomMapTab.template.maximalSize");
-
-	minSizeString.replaceNumber(minSize.x);
-	minSizeString.replaceNumber(minSize.y);
-	minSizeString.replaceNumber(minSize.z);
-	maxSizeString.replaceNumber(maxSize.x);
-	maxSizeString.replaceNumber(maxSize.y);
-	maxSizeString.replaceNumber(maxSize.z);
-
-	if (mapTemplate)
-	{
-		MetaString templateTitle;
-		templateTitle.appendRawString("%s: %s");
-		templateTitle.replaceTextID("vcmi.randomMapTab.widgets.templateLabel");
-		templateTitle.replaceRawString(mapTemplate->getName());
-
-		titles.push_back(std::make_shared<CLabel>(10, 40, FONT_SMALL, ETextAlignment::CENTERLEFT, Colors::WHITE, templateTitle.toString()));
-	}
-
-	sizeLabels.push_back(std::make_shared<CLabel>(10, 60, FONT_SMALL, ETextAlignment::CENTERLEFT, Colors::WHITE, minSizeString.toString()));
-	sizeLabels.push_back(std::make_shared<CLabel>(10, 80, FONT_SMALL, ETextAlignment::CENTERLEFT, Colors::WHITE, maxSizeString.toString()));
-
-	const auto checkTemplateSize = [this, mapTemplate](const std::string &){
-		int3 mapSize {
-			std::stoi(numInputs[0]->getText()),
-			std::stoi(numInputs[1]->getText()),
-			std::stoi(numInputs[2]->getText())
-		};
-
-		bool isSizeLegal = mapTemplate ? mapTemplate->matchesSize(mapSize) : (mapSize.x * mapSize.y >= 36*36);
-
-		buttonOk->block(!isSizeLegal);
-
-		auto labelColors = isSizeLegal ? Colors::WHITE : Colors::RED;
-
-		for (const auto & label : sizeLabels)
-			label->setColor(labelColors);
-	};
-
 	titles.push_back(std::make_shared<CLabel>(150, 15, FONT_BIG, ETextAlignment::CENTER, Colors::WHITE, LIBRARY->generaltexth->translate("vcmi.lobby.customRmgSize.title")));
+	description = std::make_shared<CMultiLineLabel>(Rect(10, 35, 280, 70), FONT_TINY, ETextAlignment::TOPCENTER, Colors::WHITE, "Note: Picking too small size may result in generation problems or unplayable map. Extremely big size may result in high memory usage and long AI turns.");
 
 	for(int i = 0; i < 3; i++)
 	{
-		Rect r(10 + i * 100, 110, 80, 20);
+		Rect r(10 + i * 100, 134, 80, 20);
 		rectangles.push_back(std::make_shared<TransparentFilledRectangle>(Rect(r.topLeft() - Point(0,18), r.dimensions()), ColorRGBA(0, 0, 0, 64), ColorRGBA(64, 64, 64, 64), 1));
 		rectangles.push_back(std::make_shared<TransparentFilledRectangle>(r, ColorRGBA(0, 0, 0, 128), ColorRGBA(64, 64, 64, 64), 1));
-		titles.push_back(std::make_shared<CLabel>(50 + i * 100, 100, FONT_SMALL, ETextAlignment::CENTER, Colors::WHITE, LIBRARY->generaltexth->translate("vcmi.lobby.customRmgSize." + std::to_string(i))));
+		titles.push_back(std::make_shared<CLabel>(50 + i * 100, 126, FONT_SMALL, ETextAlignment::CENTER, Colors::WHITE, LIBRARY->generaltexth->translate("vcmi.lobby.customRmgSize." + std::to_string(i))));
 		numInputs.push_back(std::make_shared<CTextInput>(r, EFonts::FONT_SMALL, ETextAlignment::CENTER, false));
 		numInputs.back()->setFilterNumber(0, i < 2 ? 999 : 9);
-		numInputs.back()->setCallback(checkTemplateSize);
 	}
 	numInputs[0]->setText(std::to_string(initSize.x));
 	numInputs[1]->setText(std::to_string(initSize.y));

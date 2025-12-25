@@ -425,14 +425,6 @@ void CMapGenOptions::setMapTemplate(const CRmgTemplate * value)
 	//validate & adapt options according to template
 	if(mapTemplate)
 	{
-		if(!mapTemplate->matchesSize(int3(getWidth(), getHeight(), getLevels())))
-		{
-			auto sizes = mapTemplate->getMapSizes();
-			setWidth(sizes.first.x);
-			setHeight(sizes.first.y);
-			setLevels(sizes.first.z);
-		}
-
 		si8 maxPlayerCount = getMaxPlayersCount(false);
 		si8 minPlayerCount = getMinPlayersCount(false);
 
