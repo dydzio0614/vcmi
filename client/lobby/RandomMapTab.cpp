@@ -220,7 +220,7 @@ void RandomMapTab::onToggleMapSize(int btnId)
 
 	if(btnId == mapSizeVal.size() - 1)
 	{
-		auto okButtonCallback = [this, setTemplateForSize](int3 ret){
+		auto okButtonCallback = [this](int3 ret){
 			if(ret.z > 2)
 			{
 				std::shared_ptr<CInfoWindow> temp = CInfoWindow::create(LIBRARY->generaltexth->translate("vcmi.lobby.customRmgSize.experimental"), PlayerColor(0), {}); //TODO: multilevel support
